@@ -1,0 +1,8 @@
+[package]
+
+name = "cicada"
+version = "0.0.1"
+authors = [ "Kayali" ]
+
+[dependencies]
+rand="0.3.10"
