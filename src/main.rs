@@ -11,8 +11,23 @@ mod fen;
 fn main(){
     use board::chessboard;
 
+    println!{"
+                `-.  \\    .-'              ██████╗██╗ ██████╗ █████╗ ██████╗  █████╗  
+        ,-`````\"\"-\\__ |  /                ██╔════╝██║██╔════╝██╔══██╗██╔══██╗██╔══██╗ 
+         '-.._    _.-'` '-o,              ██║     ██║██║     ███████║██║  ██║███████║ 
+             _>--:{{<   ) |)               ██║     ██║██║     ██╔══██║██║  ██║██╔══██║ 
+         .-''      '-.__.-o`              ╚██████╗██║╚██████╗██║  ██║██████╔╝██║  ██║ 
+        '-._____..-/`  |  \\                ╚═════╝╚═╝ ╚═════╝╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝ 
+                ,-'   /    `-.                                     \"Numbers Matter\""};
+
+
     // init order is important
+    println!("\n Startup Sequence:");
+
+    println!(" [i] Initializing Zobrist Hash Tables");
     zobrist::init();
+
+    println!(" [i] Initializing Chessboard");
     let mut main_board : chessboard = board::init();
 
     fen::parse("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", &mut main_board);
