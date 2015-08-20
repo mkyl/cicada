@@ -36,11 +36,11 @@ pub fn init() {
 }
 
 pub fn hash(sboard: &board::chessboard) -> u64 {
-    let mut hash = 0u64;
+    let mut hash : u64 = 0;
 
-    for i in 0..board::full_board_size {
+    for i in 0..board::playable_size {
         unsafe {
-            hash ^= zobrist[sboard.layout[i] as usize][i];
+            hash ^= zobrist[sboard.layout[board::chocolate[i] as usize] as usize][i];
         }
     }
 
@@ -54,12 +54,12 @@ pub fn hash(sboard: &board::chessboard) -> u64 {
         }
     }
 
-    if sboard.en_passant != board::void {
+    if sboard.en_passant != board::void_square {
         unsafe {
             // mod 10 to find file
             hash ^= EP[(sboard.en_passant % 10) as usize]; 
         }
     }
     
-    hash
+    return hash;
 }

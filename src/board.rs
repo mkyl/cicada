@@ -1,11 +1,13 @@
+pub static mut chocolate : [u8; 64] = [0; 64];
 
 pub const full_board_size: usize = 120;
-pub const void: u8 = 100; 
+pub const playable_size: usize = 64;
+pub const void_square: u8 = 100; 
 const max_game_length: usize = 1024;
 const white: bool = false;
 const black: bool = true;
 
-enum piece {
+pub enum piece {
     Empty,
     P,
     N,
@@ -45,7 +47,7 @@ enum rank {
     invalid_rank
 }
 
-enum castling_bits {
+pub enum castling_bits {
     K_cp = 1 << 0,
     Q_cp = 1 << 1,
     k_cp = 1 << 2,
@@ -65,18 +67,21 @@ pub enum square {
 }
 
 
-struct past {
+struct snapshot {
     move_key: u16,
+
     castling: u8,
     en_passant: u8,
-    fifty: u8
+    fifty: u8,
+
+    zobrist: u64
 }
 
 pub struct chessboard {
     // array containing board
     // see ../theory.md for explanation of layout
     pub layout: [u8; full_board_size],
-    piece_list: [[u8; 13]; 10],
+    piece_list: [[u8; 10]; 13],
     
     // number of half moves
     // engine has looked ahead
@@ -91,11 +96,93 @@ pub struct chessboard {
     pub castling: u8,
     pub side: bool,
 
-    history: [past; max_game_length],
+    past: [snapshot; max_game_length],
 
     zobrist: u64
 }
 
-pub fn init() -> () {
 
+pub fn init() -> (chessboard) {
+    use std::mem;
+
+    let mut counter = 0;
+    for x in 0..full_board_size {
+        if x > 20 && x < 99 && x % 10 != 0 && x % 10 != 9 {
+            unsafe {
+                chocolate[counter] = x as u8;
+            }
+            counter += 1;
+        }
+    }
+
+    let mut new_board : chessboard = chessboard{
+        layout: [0; full_board_size],
+        piece_list: [[0; 10]; 13],
+        ply: 0,
+        depth: 0,
+        fifty: 0,
+        en_passant: void_square,
+        castling: 0,
+        side: white,
+        past: unsafe { mem::zeroed() } ,
+        zobrist: 0
+    }; 
+
+    reset(&mut new_board);
+
+    return new_board;
+    /*
+    for x in 0..12 {
+        println!(" {} {} {} {} {} {} {} {} {} {} ", 
+                 new_board.layout[0 + 10 * x],
+                 new_board.layout[1 + 10 * x],
+                 new_board.layout[2 + 10 *x],
+                 new_board.layout[3 + 10 *x],
+                 new_board.layout[4 + 10 *x],
+                 new_board.layout[5 + 10 *x],
+                 new_board.layout[6 + 10 *x],
+                 new_board.layout[7 + 10 *x],
+                 new_board.layout[8 + 10 *x],
+                 new_board.layout[9 + 10 *x]);
+    }
+
+    for x in 0..64 {
+        println!(" {} ", unsafe{chocolate[x]});
+    }
+
+    println!("zobrist hash stored: {}", new_board.zobrist);
+    println!("zobrist hash recalc: {}", zobrist::hash(&new_board));
+    */
+}
+
+fn reset (board: &mut chessboard) {
+    use std::mem;
+    use zobrist;
+
+    for i in 0..full_board_size {
+        board.layout[i] = void_square;
+    }
+
+    for i in 0..playable_size {
+        unsafe {
+            board.layout[chocolate[i] as usize] = piece::Empty as u8;
+        }
+    }
+
+    for i in 0..piece::k as usize {
+        for x in 0..10 {
+            board.piece_list[i][x] = 0;
+        }
+    }
+
+    board.castling = castling_bits::K_cp as u8 | castling_bits::Q_cp as u8 
+        | castling_bits::k_cp as u8 | castling_bits::q_cp as u8;
+
+    board.en_passant = void_square;
+
+    board.side = white;
+
+    board.past = { unsafe { mem::zeroed() } };
+
+    board.zobrist = zobrist::hash(board);
 }

@@ -8,6 +8,9 @@ mod zobrist;
 pub mod board;
 
 fn main(){
+    use board::chessboard;
+
+    // init order is important
     zobrist::init();
-   // zobrist::hash();
+    let mut main_board : chessboard = board::init();
 }
