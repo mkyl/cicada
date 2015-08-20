@@ -1,11 +1,10 @@
 pub static mut chocolate : [u8; 64] = [0; 64];
-
 pub const full_board_size: usize = 120;
 pub const playable_size: usize = 64;
 pub const void_square: u8 = 100; 
 const max_game_length: usize = 1024;
-const white: bool = false;
-const black: bool = true;
+pub const white: bool = false;
+pub const black: bool = true;
 
 pub enum piece {
     Empty,
@@ -23,7 +22,7 @@ pub enum piece {
     k
 }
 
-enum file {
+pub enum file {
     file_a,
     file_b,
     file_c,
@@ -35,7 +34,7 @@ enum file {
     invalid_file
 }
 
-enum rank {
+pub enum rank {
     rank_1,
     rank_2,
     rank_3,
@@ -88,9 +87,9 @@ pub struct chessboard {
     ply: u8,
 
     // how many half moves have been played so far
-    depth: u16,
+    pub depth: u16,
     // used for FIDE rule 9.3
-    fifty: u8,
+    pub fifty: u8,
     // stores index of EP square, if any
     pub en_passant: u8,
     pub castling: u8,
@@ -185,4 +184,15 @@ fn reset (board: &mut chessboard) {
     board.past = { unsafe { mem::zeroed() } };
 
     board.zobrist = zobrist::hash(board);
+}
+
+pub fn AN_to_chocolate (file : char, rank : u8) -> (u8) {
+    let rank_index = rank - '1' as u8;
+    let file_index = file as u8 - 'a' as u8;
+
+    (rank_index + 2) * 10 + file_index + 1
+}
+
+pub fn AN_to_board (file : u8, rank : u8) -> (u8) {
+    (rank + 2) * 10 + file + 1
 }

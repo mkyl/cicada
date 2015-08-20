@@ -4,8 +4,9 @@
 
 extern crate rand;
 
-mod zobrist;
 pub mod board;
+mod zobrist;
+mod fen;
 
 fn main(){
     use board::chessboard;
@@ -13,4 +14,6 @@ fn main(){
     // init order is important
     zobrist::init();
     let mut main_board : chessboard = board::init();
+
+    fen::parse("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", &mut main_board);
 }
