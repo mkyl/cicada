@@ -57,7 +57,7 @@ pub fn hash(sboard: &board::chessboard) -> u64 {
     if sboard.en_passant != board::void_square {
         unsafe {
             // mod 10 to find file
-            hash ^= EP[(sboard.en_passant % 10) as usize]; 
+            hash ^= EP[(sboard.en_passant % 10) as usize - 1]; 
         }
     }
     

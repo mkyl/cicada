@@ -8,19 +8,37 @@ pub const black: bool = true;
 
 pub enum piece {
     Empty,
-    P,
-    N,
-    B,
-    R,
-    Q,
     K,
-    p,
-    n,
-    b,
-    r,
+    Q,
+    R,
+    B,
+    N,
+    P,
+    k,
     q,
-    k
+    r,
+    b,
+    n,
+    p
 }
+
+/*
+pub enum value {
+    Empty,
+    K = 14,
+    Q = 9,
+    R = 5,
+    B = 3,
+    N = 3,
+    P = 1,
+    k = 14,
+    q = 9,
+    r = 5,
+    b = 3,
+    n = 3,
+    p = 1
+}
+*/
 
 pub enum file {
     file_a,
@@ -80,8 +98,10 @@ pub struct chessboard {
     // array containing board
     // see ../theory.md for explanation of layout
     pub layout: [u8; full_board_size],
-    piece_list: [[u8; 10]; 13],
-    
+    pub piece_count: [u8; 13],
+    pub piece_list: [[u8; 10]; 13],
+    score: [u8; 2],
+
     // number of half moves
     // engine has looked ahead
     ply: u8,
@@ -117,6 +137,8 @@ pub fn init() -> (chessboard) {
     let mut new_board : chessboard = chessboard{
         layout: [0; full_board_size],
         piece_list: [[0; 10]; 13],
+        piece_count: [0; 13],
+        score: [0; 2],
         ply: 0,
         depth: 0,
         fifty: 0,
@@ -154,7 +176,7 @@ pub fn init() -> (chessboard) {
     */
 }
 
-fn reset (board: &mut chessboard) {
+pub fn reset (board: &mut chessboard) {
     use std::mem;
     use zobrist;
 
@@ -168,11 +190,15 @@ fn reset (board: &mut chessboard) {
         }
     }
 
-    for i in 0..piece::k as usize {
+    for i in 0..piece::p as usize {
         for x in 0..10 {
             board.piece_list[i][x] = 0;
         }
     }
+
+    board.piece_count = [0; 13];
+
+    board.score = [0; 2];
 
     board.castling = castling_bits::K_cp as u8 | castling_bits::Q_cp as u8 
         | castling_bits::k_cp as u8 | castling_bits::q_cp as u8;
@@ -197,13 +223,25 @@ pub fn AN_to_board (file : u8, rank : u8) -> (u8) {
     (rank + 2) * 10 + file + 1
 }
 
+pub fn update_pieces (cboard: &mut chessboard) {
+    for i in 0..playable_size {
+        unsafe {
+            let index = chocolate[i];
+            let piece = cboard.layout[index as usize];
+
+            if piece != piece::Empty as u8 {
+                cboard.piece_list[piece as usize][cboard.piece_count[piece as usize] as usize] = index;
+                cboard.piece_count[piece as usize] += 1;
+            }
+        }
+    }
+}
+
 pub fn print (cboard: &chessboard) {
     for x in (0..rank::rank_8 as u8 + 1).rev() {
         print!("{}  ", x as u8 + 1);
         for i in 0..file::file_h as u8 + 1{
-            unsafe {
-                print!( "{:2} ", cboard.layout[AN_to_board(i,x) as usize]);
-            }
+            print!( "{:2} ", cboard.layout[AN_to_board(i,x) as usize]);
         }
         println!("");
     }
@@ -211,6 +249,11 @@ pub fn print (cboard: &chessboard) {
 
     println!("Castling: {}, Side: {}, En Passant: {}", cboard.castling, cboard.side, cboard.en_passant);
     println!("Moves: {}, Fifty: {}", cboard.depth, cboard.fifty);
-    println!("Hash: {}", cboard.zobrist);
+    for i in 0..piece::p as usize + 1 {
+        print!("{}: {} pieces | ", i,  cboard.piece_count[i]);
+    }
+    println!("white king: {}, black king: {}", cboard.piece_list[piece::K as usize][0], cboard.piece_list[piece::k as usize][0]);
+    println!("1 white rook: {}, 2 white rook: {}", cboard.piece_list[piece::R as usize][0], cboard.piece_list[piece::R as usize][1]);
+    println!("\nHash: {}", cboard.zobrist);
     print!("\n");
 }

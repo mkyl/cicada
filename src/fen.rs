@@ -7,6 +7,8 @@ pub fn parse(fen : &'static str, cboard: &mut board::chessboard) {
     use board::rank;
     use board::file;
 
+    board::reset(cboard);
+
     let mut rank : u8 = rank::rank_8 as u8;
     let mut file : u8 = file::file_a as u8;
 
@@ -69,6 +71,7 @@ pub fn parse(fen : &'static str, cboard: &mut board::chessboard) {
             'Q' => cboard.castling |= castling_bits::Q_cp as u8,
             'k' => cboard.castling |= castling_bits::k_cp as u8,
             'q' => cboard.castling |= castling_bits::q_cp as u8,
+            '-' => cboard.castling = 0,
              _ => panic!("[!] Critical: Invalid FEN castling code"),
         }
         counter += 1;
@@ -107,6 +110,9 @@ pub fn parse(fen : &'static str, cboard: &mut board::chessboard) {
     } else if counter + 1 == fen.len() {
         cboard.depth = fen[counter] as u16 - '0' as u16;
     }
+
+    // update piece list
+    board::update_pieces(cboard);
 
     // hash update
     cboard.zobrist = zobrist::hash(cboard); 
