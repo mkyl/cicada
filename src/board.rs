@@ -97,7 +97,7 @@ pub struct chessboard {
 
     past: [snapshot; max_game_length],
 
-    zobrist: u64
+    pub zobrist: u64
 }
 
 
@@ -195,4 +195,30 @@ pub fn AN_to_chocolate (file : char, rank : u8) -> (u8) {
 
 pub fn AN_to_board (file : u8, rank : u8) -> (u8) {
     (rank + 2) * 10 + file + 1
+}
+
+pub fn print (cboard: &chessboard) {
+    for x in (0..playable_size).rev() {
+        unsafe {
+            print!( "{} ", cboard.layout[chocolate[x] as usize]);
+        }
+        if x % 8 == 0 {
+            println!("");
+        }
+    }
+    println!("\nA B C D E F G H (flipped board)");
+
+    for x in (0..full_board_size).rev() {
+        unsafe {
+            print!( "{} ", cboard.layout[x]);
+        }
+        if x % 10 == 0 {
+            println!("");
+        }
+    }
+
+    println!("Castling: {}, Side: {}, En Passant: {}", cboard.castling, cboard.side, cboard.en_passant);
+    println!("Moves: {}, Fifty: {}", cboard.depth, cboard.fifty);
+    println!("Hash: {}", cboard.zobrist);
+    print!("\n");
 }

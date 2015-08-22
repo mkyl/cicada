@@ -1,4 +1,5 @@
 pub use board;
+use zobrist;
 
 pub fn parse(fen : &'static str, cboard: &mut board::chessboard) {
     use board::castling_bits;
@@ -16,18 +17,18 @@ pub fn parse(fen : &'static str, cboard: &mut board::chessboard) {
     while fen[counter] as char != ' ' {
         let mut empty = 0;
         match fen[counter] as char {
-            'P' => cboard.layout[board::AN_to_board(file, rank) as usize] = piece::P as u8,
-            'N' => cboard.layout[board::AN_to_board(file, rank) as usize] = piece::N as u8,
-            'B' => cboard.layout[board::AN_to_board(file, rank) as usize] = piece::B as u8,
-            'R' => cboard.layout[board::AN_to_board(file, rank) as usize] = piece::R as u8,
-            'Q' => cboard.layout[board::AN_to_board(file, rank) as usize] = piece::Q as u8,
-            'K' => cboard.layout[board::AN_to_board(file, rank) as usize] = piece::K as u8,
-            'p' => cboard.layout[board::AN_to_board(file, rank) as usize] = piece::p as u8,
-            'n' => cboard.layout[board::AN_to_board(file, rank) as usize] = piece::n as u8,
-            'b' => cboard.layout[board::AN_to_board(file, rank) as usize] = piece::b as u8,
-            'r' => cboard.layout[board::AN_to_board(file, rank) as usize] = piece::r as u8,
-            'q' => cboard.layout[board::AN_to_board(file, rank) as usize] = piece::q as u8,
-            'k' => cboard.layout[board::AN_to_board(file, rank) as usize] = piece::k as u8,
+            'P' => {cboard.layout[board::AN_to_board(file, rank) as usize] = piece::P as u8; file += 1},
+            'N' => {cboard.layout[board::AN_to_board(file, rank) as usize] = piece::N as u8; file += 1},
+            'B' => {cboard.layout[board::AN_to_board(file, rank) as usize] = piece::B as u8; file += 1},
+            'R' => {cboard.layout[board::AN_to_board(file, rank) as usize] = piece::R as u8; file += 1},
+            'Q' => {cboard.layout[board::AN_to_board(file, rank) as usize] = piece::Q as u8; file += 1},
+            'K' => {cboard.layout[board::AN_to_board(file, rank) as usize] = piece::K as u8; file += 1},
+            'p' => {cboard.layout[board::AN_to_board(file, rank) as usize] = piece::p as u8; file += 1},
+            'n' => {cboard.layout[board::AN_to_board(file, rank) as usize] = piece::n as u8; file += 1},
+            'b' => {cboard.layout[board::AN_to_board(file, rank) as usize] = piece::b as u8; file += 1},
+            'r' => {cboard.layout[board::AN_to_board(file, rank) as usize] = piece::r as u8; file += 1},
+            'q' => {cboard.layout[board::AN_to_board(file, rank) as usize] = piece::q as u8; file += 1},
+            'k' => {cboard.layout[board::AN_to_board(file, rank) as usize] = piece::k as u8; file += 1},
 
             '1' ... '8' => empty = fen[counter],
 
@@ -36,14 +37,19 @@ pub fn parse(fen : &'static str, cboard: &mut board::chessboard) {
              _  => {println!("{}", fen[counter]) ; panic!("[!] Critical: Invalid FEN layout code")},
         }
 
+
         if empty != 0 {
             let start = board::AN_to_board(file, rank) as usize;
-            empty = empty - ('1' as u8);
+            empty = empty - ('0' as u8);
+            println!("empty: {}", empty);
 
             for i in 0..empty {
                 cboard.layout[start + i as usize] = piece::Empty as u8;
             }
+
+            file += empty;
         }
+
         counter += 1; 
     }
     counter += 1;
@@ -102,4 +108,7 @@ pub fn parse(fen : &'static str, cboard: &mut board::chessboard) {
     } else if counter + 1 == fen.len() {
         cboard.depth = fen[counter] as u16 - '0' as u16;
     }
+
+    // hash update
+    cboard.zobrist = zobrist::hash(cboard); 
 }
