@@ -1,4 +1,4 @@
-pub use board;
+use board;
 use board::chessboard;
 
 static mut zobrist: [[u64; board::full_board_size]; 13] = [[0; board::full_board_size]; 13];

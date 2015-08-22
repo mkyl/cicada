@@ -1,4 +1,4 @@
-pub use board;
+use board;
 use zobrist;
 
 pub fn parse(fen : &'static str, cboard: &mut board::chessboard) {
@@ -41,7 +41,6 @@ pub fn parse(fen : &'static str, cboard: &mut board::chessboard) {
         if empty != 0 {
             let start = board::AN_to_board(file, rank) as usize;
             empty = empty - ('0' as u8);
-            println!("empty: {}", empty);
 
             for i in 0..empty {
                 cboard.layout[start + i as usize] = piece::Empty as u8;
