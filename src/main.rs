@@ -7,6 +7,7 @@ extern crate rand;
 mod board;
 mod zobrist;
 mod fen;
+mod square;
 mod sanity;
 
 fn main(){
@@ -34,3 +35,4 @@ fn main(){
     fen::parse("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", &mut main_board);
     board::print(&main_board);
 }
+

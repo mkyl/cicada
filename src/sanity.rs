@@ -92,5 +92,5 @@ fn castling() {
 }
 
 fn verify_castle(cboard: &board::chessboard) {
-    assert!(cboard.castling >= 0 && cboard.castling <= 15);
+    assert!(cboard.castling <= 15);
 }
