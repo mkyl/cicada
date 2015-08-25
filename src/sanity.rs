@@ -94,3 +94,13 @@ fn castling() {
 fn verify_castle(cboard: &board::chessboard) {
     assert!(cboard.castling <= 15);
 }
+
+pub fn sane(cboard: &board::chessboard) -> bool {
+    let result : bool = true;
+
+    verify_squares(cboard);
+    verify_pl(cboard);
+    verify_castle(cboard);
+
+    result
+}

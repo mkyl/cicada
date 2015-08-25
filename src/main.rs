@@ -34,7 +34,6 @@ fn main(){
     let mut main_board : chessboard = board::init();
 
     fen::parse("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", &mut main_board);
-    /*
     board::print(&main_board);
 
     let hello = moves::_move::new(56, 77, 0, board::piece::r as u8, true, false, true);
@@ -45,6 +44,7 @@ fn main(){
         print!("{}", moves::to_AN(&hello)[x]);
     }
     println!("");
-    */
+
+    debug_assert!(sanity::sane(&main_board));
 }
 
