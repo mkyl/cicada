@@ -8,6 +8,7 @@ mod board;
 mod zobrist;
 mod fen;
 mod square;
+mod moves;
 mod sanity;
 
 fn main(){
@@ -33,6 +34,17 @@ fn main(){
     let mut main_board : chessboard = board::init();
 
     fen::parse("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", &mut main_board);
+    /*
     board::print(&main_board);
+
+    let hello = moves::_move::new(56, 77, 0, board::piece::r as u8, true, false, true);
+    println!("from: {} to: {} promoted:{} EP:{}", moves::from(&hello), moves::to(&hello), moves::promoted(&hello),
+    moves::castling(&hello));
+
+    for x in 0..5 {
+        print!("{}", moves::to_AN(&hello)[x]);
+    }
+    println!("");
+    */
 }
 

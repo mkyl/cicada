@@ -5,6 +5,7 @@ pub const void_square: u8 = 100;
 const max_game_length: usize = 1024;
 pub const white: bool = false;
 pub const black: bool = true;
+pub const AN_pieces: [char; 13] = ['x', 'k', 'q', 'r', 'b', 'n', 'p', 'k', 'q', 'r', 'b', 'n', 'p'];
 
 pub enum piece {
     Empty,
@@ -221,6 +222,13 @@ pub fn AN_to_chocolate (file : char, rank : u8) -> (u8) {
 
 pub fn AN_to_board (file : u8, rank : u8) -> (u8) {
     (rank + 2) * 10 + file + 1
+}
+
+pub fn to_AN(square : u8) -> [char; 2] {
+    let mut answer : [char; 2] = ['0'; 2];
+    answer[0] = ('a' as u8 + (square % 10 - 1)) as char;
+    answer[1] = ('1' as u8 + (square / 10 - 2)) as char;
+    answer
 }
 
 pub fn update_pieces (cboard: &mut chessboard) {
