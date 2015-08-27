@@ -1,9 +1,9 @@
 use board;
-use fen;
-use zobrist;
 
 #[test]
 fn layout() {
+    use fen;
+    use zobrist;
     zobrist::init();
     let mut main_board : board::chessboard = board::init();
 
@@ -33,6 +33,8 @@ fn verify_squares (cboard: &board::chessboard) {
 
 #[test]
 fn hashing() {
+    use fen;
+    use zobrist;
     zobrist::init();
     let mut main_board : board::chessboard = board::init();
 
@@ -51,6 +53,8 @@ fn hashing() {
 
 #[test]
 fn piece_list() {
+    use fen;
+    use zobrist;
     zobrist::init();
     let mut main_board : board::chessboard = board::init();
 
@@ -62,6 +66,9 @@ fn piece_list() {
 
     fen::parse("r1bq1rk1/pp3ppp/3n4/2p1N3/2B5/7P/PPP2PP1/R1BQR1K1 w - h2 0 33", &mut main_board);
     verify_pl(&main_board);
+
+    fen::parse("rnbqkb1r/pp1p1pPp/8/2p1pP2/1P1P4/3P3P/P1P1P3/RNBQKBNR w KQkq - 0 1", &mut main_board);
+    verify_pl(&main_board);
 }
 
 fn verify_pl(cboard: &board::chessboard) {
@@ -72,7 +79,7 @@ fn verify_pl(cboard: &board::chessboard) {
         for x in 0..cboard.piece_count[i]{
             assert_eq!(cboard.layout[cboard.piece_list[i as usize][x as usize] as usize], i as u8);
         }
-        assert_eq!(cboard.piece_list[i][cboard.piece_count[i] as usize+1], 0);
+        assert_eq!(cboard.piece_list[i][cboard.piece_count[i] as usize], 0);
         if cboard.piece_count[i] != 0 {
             assert!(cboard.piece_list[i][cboard.piece_count[i] as usize - 1] != 0);
         }
@@ -81,6 +88,8 @@ fn verify_pl(cboard: &board::chessboard) {
 
 #[test]
 fn castling() {
+    use fen;
+    use zobrist;
     zobrist::init();
     let mut main_board : board::chessboard = board::init();
 
@@ -98,9 +107,9 @@ fn verify_castle(cboard: &board::chessboard) {
 pub fn sane(cboard: &board::chessboard) -> bool {
     let result : bool = true;
 
-    verify_squares(cboard);
-    verify_pl(cboard);
-    verify_castle(cboard);
+     verify_squares(cboard);
+     verify_pl(cboard);
+     verify_castle(cboard);
 
     result
 }
