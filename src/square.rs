@@ -1,9 +1,9 @@
 use board;
 
-const diagonal : [i8; 4] = [11, 9, -9, -11];
-const knight : [i8; 8] = [8, 19, 21, 12, -8, -19, -21, -12];
-const cross : [i8; 4] = [10, 1, -10, -1];
-const king : [i8; 8] = [9, 10, 11, 1, -9, -10, -11, -1];
+pub const diagonal : [i8; 4] = [11, 9, -9, -11];
+pub const knight : [i8; 8] = [8, 19, 21, 12, -8, -19, -21, -12];
+pub const cross : [i8; 4] = [10, 1, -10, -1];
+pub const king : [i8; 8] = [9, 10, 11, 1, -9, -10, -11, -1];
 
 pub fn attacked(target : u8, side : bool, cboard : &board::chessboard) -> bool {
     let mut search : u8;

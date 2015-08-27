@@ -1,4 +1,5 @@
 use board;
+use square;
 
 const max_moves : usize = 256;
 const around : [i8; 2] = [1, -1];
@@ -12,6 +13,7 @@ pub struct _move {
 
 impl _move {
     pub fn new(from : u8, to : u8, captured : u8, promoted : u8, en_passant : bool, pawn_double : bool, castling : bool) -> _move {
+        // TODO double check on EP in move generator
         let mut combined : u32 = 0;
         combined |= from as u32;
         combined |= (to as u32) << 7;
@@ -103,18 +105,154 @@ pub fn generator(list : &mut movelist, cboard : &board::chessboard) {
             // TODO more elegant way
             match x - baseline {
                 1 => { // king
+                    for y in 0..8 {
+                        let target = cboard.layout[(piece.wrapping_add(square::king[y] as u8)) as usize];
+                        if target != board::void_square && (target < baseline as u8 + 1 || target > baseline as u8 + 6) {
+                            if target == board::piece::Empty as u8 {
+                                add_move(_move::new(piece, piece.wrapping_add(square::king[y] as u8), 0, 0,
+                                false, false, false), list);
+                            } else {
+                                add_move(_move::new(piece, piece.wrapping_add(square::king[y] as u8), target, 0,
+                                false, false, false), list);
+                            }
+                        }
+                    }
+                    // castling
+                    if baseline == 0 {
+                        if cboard.castling as u8 & board::castling_bits::K_cp as u8 != 0 {
+                            if cboard.layout[board::square::F1 as usize] == board::piece::Empty as u8 {
+                                if cboard.layout[board::square::G1 as usize] == board::piece::Empty as u8 {
+                                    if !square::attacked(board::square::E1 as u8, board::black, cboard) &&
+                                        !square::attacked(board::square::F1 as u8, board::black, cboard) {
+                                        add_move(_move::new(piece, board::square::G1 as u8, 0, 0,
+                                            false, false, true), list);
+                                    }
+                                }
+                            }
+                        }
+                        if cboard.castling as u8 & board::castling_bits::Q_cp as u8 != 0 {
+                            if cboard.layout[board::square::D1 as usize] == board::piece::Empty as u8 {
+                                if cboard.layout[board::square::C1 as usize] == board::piece::Empty as u8 {
+                                    if cboard.layout[board::square::B1 as usize] == board::piece::Empty as u8 {
+                                        if !square::attacked(board::square::E1 as u8, board::black, cboard) &&
+                                            !square::attacked(board::square::D1 as u8, board::black, cboard) {
+                                            add_move(_move::new(piece, board::square::C1 as u8, 0, 0,
+                                                false, false, true), list);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        if cboard.castling as u8 & board::castling_bits::k_cp as u8 != 0 {
+                            if cboard.layout[board::square::F8 as usize] == board::piece::Empty as u8 {
+                                if cboard.layout[board::square::G8 as usize] == board::piece::Empty as u8 {
+                                    if !square::attacked(board::square::E8 as u8, board::white, cboard) &&
+                                        !square::attacked(board::square::F8 as u8, board::white, cboard) {
+                                        add_move(_move::new(piece, board::square::G8 as u8, 0, 0,
+                                            false, false, true), list);
+                                    }
+                                }
+                            }
+                        }
+                        if cboard.castling as u8 & board::castling_bits::q_cp as u8 != 0 {
+                            if cboard.layout[board::square::D8 as usize] == board::piece::Empty as u8 {
+                                if cboard.layout[board::square::C8 as usize] == board::piece::Empty as u8 {
+                                    if cboard.layout[board::square::B8 as usize] == board::piece::Empty as u8 {
+                                        if !square::attacked(board::square::E8 as u8, board::white, cboard) &&
+                                            !square::attacked(board::square::D8 as u8, board::white, cboard) {
+                                            add_move(_move::new(piece, board::square::C8 as u8, 0, 0,
+                                                false, false, true), list);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 },
 
                 2 => { // queen
+                    for y in 0..4 {
+                        let mut mark = piece as i8;
+                        loop {
+                            mark += square::cross[y];
+                            let target = cboard.layout[mark as usize];
+                            if target == board::piece::Empty as u8 {
+                                add_move(_move::new(piece, mark as u8, 0, 0, false, false, false), list);
+                            } else if target != board::void_square && (target < baseline as u8 + 1 || target > baseline as u8 + 6) {
+                                add_move(_move::new(piece, mark as u8, target, 0, false, false, false), list);
+                                break;
+                            } else {
+                                break;
+                            }
+                        }
+                    }
+                    for y in 0..4 {
+                        let mut mark = piece as i8;
+                        loop {
+                            mark += square::diagonal[y];
+                            let target = cboard.layout[mark as usize];
+                            if target == board::piece::Empty as u8 {
+                                add_move(_move::new(piece, mark as u8, 0, 0, false, false, false), list);
+                            } else if target != board::void_square && (target < baseline as u8 + 1 || target > baseline as u8 + 6) {
+                                add_move(_move::new(piece, mark as u8, target, 0, false, false, false), list);
+                                break;
+                            } else {
+                                break;
+                            }
+                        }
+                    }
                 },
 
                 3 => { // rook
+                    for y in 0..4 {
+                        let mut mark = piece as i8;
+                        loop {
+                            mark += square::cross[y];
+                            let target = cboard.layout[mark as usize];
+                            if target == board::piece::Empty as u8 {
+                                add_move(_move::new(piece, mark as u8, 0, 0, false, false, false), list);
+                            } else if target != board::void_square && (target < baseline as u8 + 1 || target > baseline as u8 + 6) {
+                                add_move(_move::new(piece, mark as u8, target, 0, false, false, false), list);
+                                break;
+                            } else {
+                                break;
+                            }
+                        }
+                    }
                 },
 
                 4 => { // bishop
+                    for y in 0..4 {
+                        let mut mark = piece as i8;
+                        loop {
+                            mark += square::diagonal[y];
+                            let target = cboard.layout[mark as usize];
+                            if target == board::piece::Empty as u8 {
+                                add_move(_move::new(piece, mark as u8, 0, 0, false, false, false), list);
+                            } else if target != board::void_square && (target < baseline as u8 + 1 || target > baseline as u8 + 6) {
+                                add_move(_move::new(piece, mark as u8, target, 0, false, false, false), list);
+                                break;
+                            } else {
+                                break;
+                            }
+                        }
+                    }
                 },
 
                 5 => { // knight
+                    for y in 0..8 {
+                        let target = cboard.layout[(piece.wrapping_add(square::knight[y] as u8)) as usize];
+                        if target != board::void_square && (target < baseline as u8 + 1 || target > baseline as u8 + 6) {
+                            if target == board::piece::Empty as u8 {
+                                add_move(_move::new(piece, piece.wrapping_add(square::knight[y] as u8), 0, 0,
+                                false, false, false), list);
+                            } else {
+                                add_move(_move::new(piece, piece.wrapping_add(square::knight[y] as u8), target, 0,
+                                false, false, false), list);
+                            }
+                        }
+                    }
                 },
 
                 6 => { // pawn
@@ -188,7 +326,11 @@ pub fn generator(list : &mut movelist, cboard : &board::chessboard) {
                                     board::piece::b as u8, false, false, false), list);
                                 add_move(_move::new(piece, piece.wrapping_add(offset as u8), target,
                                     board::piece::n as u8, false, false, false), list);
-                            } else {
+                            } else if piece.wrapping_add(offset as u8) == cboard.en_passant{
+                                add_move(_move::new(piece, piece.wrapping_add(offset as u8), target,
+                                     0, true, false, false), list);
+                            }
+                                else {
                                 add_move(_move::new(piece, piece.wrapping_add(offset as u8), target,
                                      0, false, false, false), list);
                             }
