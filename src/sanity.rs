@@ -1,4 +1,6 @@
 use board;
+use moves;
+use movement;
 
 #[test]
 fn layout() {
@@ -111,4 +113,48 @@ pub fn sane(cboard: &board::chessboard) -> bool {
      verify_castle(cboard);
 
     result
+}
+
+static mut leafnodes : f64 = 0f64;
+
+pub fn perft(depth : i32, cboard : &mut board::chessboard) {
+    if depth == 0 {
+        unsafe {
+            leafnodes += 1f64;
+            return;
+        }
+    }
+
+    let mut move_list : moves::movelist =  moves::movelist::new();
+    moves::generator(&mut move_list, cboard);
+   
+    for x in 0..move_list.count as usize {
+        if ( !movement::make(&move_list.all[x], cboard) ) {
+            continue
+        }
+        perft(depth - 1, cboard);
+        movement::undo(cboard);
+    }
+}
+
+pub fn perft_test(depth: i32, cboard : &mut board::chessboard) {
+    unsafe {
+    println!("Perft test to depth: {}", depth);
+    leafnodes = 0f64;
+
+    let mut move_list : moves::movelist =  moves::movelist::new();
+    moves::generator(&mut move_list, cboard);
+
+    for x in 0..move_list.count as usize {
+        if ( !movement::make(&move_list.all[x], cboard) ) {
+            continue
+        }
+        let cumnodes = leafnodes;
+        perft(depth - 1, cboard);
+        movement::undo(cboard);
+        let oldnodes = leafnodes - cumnodes;
+    }
+
+    println!("Test Complete: {} nodes", leafnodes);
+    }
 }
