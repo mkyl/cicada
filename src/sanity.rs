@@ -79,7 +79,6 @@ fn verify_pl(cboard: &board::chessboard) {
         for x in 0..cboard.piece_count[i]{
             assert_eq!(cboard.layout[cboard.piece_list[i as usize][x as usize] as usize], i as u8);
         }
-        assert_eq!(cboard.piece_list[i][cboard.piece_count[i] as usize], 0);
         if cboard.piece_count[i] != 0 {
             assert!(cboard.piece_list[i][cboard.piece_count[i] as usize - 1] != 0);
         }

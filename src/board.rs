@@ -85,14 +85,14 @@ pub enum square {
 }
 
 
-struct snapshot {
-    move_key: u16,
+pub struct snapshot {
+    pub move_key: u32,
 
-    castling: u8,
-    en_passant: u8,
-    fifty: u8,
+    pub castling: u8,
+    pub en_passant: u8,
+    pub fifty: u8,
 
-    zobrist: u64
+    pub zobrist: u64
 }
 
 pub struct chessboard {
@@ -101,11 +101,11 @@ pub struct chessboard {
     pub layout: [u8; full_board_size],
     pub piece_count: [u8; 13],
     pub piece_list: [[u8; 10]; 13],
-    score: [u8; 2],
+    pub score: [u8; 2],
 
     // number of half moves
     // engine has looked ahead
-    ply: u8,
+    pub ply: u8,
 
     // how many half moves have been played so far
     pub depth: u16,
@@ -116,7 +116,7 @@ pub struct chessboard {
     pub castling: u8,
     pub side: bool,
 
-    past: [snapshot; max_game_length],
+    pub past: [snapshot; max_game_length],
 
     pub zobrist: u64
 }

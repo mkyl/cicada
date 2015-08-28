@@ -1,4 +1,5 @@
 use board;
+use zobrist;
 
 pub const diagonal : [i8; 4] = [11, 9, -9, -11];
 pub const knight : [i8; 8] = [8, 19, 21, 12, -8, -19, -21, -12];
@@ -81,4 +82,56 @@ pub fn attacked(target : u8, side : bool, cboard : &board::chessboard) -> bool {
 
     // no attack found
     false
+}
+
+pub fn clear (target : u8, cboard : &mut board::chessboard) {
+    debug_assert!(cboard.layout[target as usize] != board::piece::Empty as u8);
+
+    // unhash target - TODO unsure this will work, need to hash in empty?
+    // should be fixed now
+    zobrist::hash_square(target, cboard);
+
+    let kind = cboard.layout[target as usize] as usize;
+    for x in 0..cboard.piece_count[kind] as usize {
+        if cboard.piece_list[kind][x] == target {
+            cboard.piece_list[kind][x] = cboard.piece_list[kind][cboard.piece_count[kind] as usize - 1];
+            break;
+        }
+    }
+    cboard.piece_count[kind] -= 1;
+
+    cboard.layout[target as usize] = board::piece::Empty as u8;
+}
+
+pub fn add (target : u8, kind : u8, cboard : &mut board::chessboard) {
+    debug_assert!(cboard.layout[target as usize] == board::piece::Empty as u8);
+
+    cboard.layout[target as usize] = kind;
+
+    cboard.piece_list[kind as usize][cboard.piece_count[kind as usize] as usize] = target;
+    cboard.piece_count[kind as usize] += 1;
+
+    // TODO could make this call cheaper
+    zobrist::hash_square(target, cboard);
+}
+
+pub fn plsmove (origin : u8, target : u8, cboard : &mut board::chessboard) {
+    debug_assert!(cboard.layout[target as usize] == board::piece::Empty as u8);
+
+    // hash out square
+    zobrist::hash_square(origin, cboard);
+
+    let kind = cboard.layout[origin as usize] as usize;
+    for x in 0..cboard.piece_count[kind] as usize {
+        if cboard.piece_list[kind][x] == origin {
+            cboard.piece_list[kind][x] = target;
+            break;
+        }
+    }
+
+    cboard.layout[target as usize] = kind as u8;
+    cboard.layout[origin as usize] = board::piece::Empty as u8;
+
+    // hash in new square
+    zobrist::hash_square(target, cboard);
 }

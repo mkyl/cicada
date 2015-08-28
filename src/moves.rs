@@ -58,7 +58,7 @@ pub fn to(m : &_move) -> u8 {
     (m.container >> 7 & 0x7f) as u8
 }
 
-pub fn captured(m : &_move) -> u8 {
+pub fn capture(m : &_move) -> u8 {
     (m.container >> 14 & 0xf) as u8
 }
 

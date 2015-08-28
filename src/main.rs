@@ -9,6 +9,7 @@ mod zobrist;
 mod fen;
 mod square;
 mod moves;
+mod movement;
 mod sanity;
 
 fn main(){
@@ -35,7 +36,7 @@ fn main(){
 
     let mut move_list : moves::movelist =  moves::movelist::new();
 
-    // fen::parse("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", &mut main_board);
+     fen::parse("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", &mut main_board);
     // fen::parse("rnbqkb1r/pp1p1pPp/8/2p1pP2/1P1P4/3P3P/P1P1P3/RNBQKBNR w KQkq e6 0 1", &mut main_board);
     // fen::parse("qrbnkbnr/p1p1p3/3p3p/1p1p4/2P1Pp2/8/PP1P1PpP/QRBNKB1R b KQkq e3 0 1", &mut main_board);
     // fen::parse("5k2/1n6/4n3/6N1/8/3N4/8/5K2 w - - 0 1", &mut main_board);
@@ -44,11 +45,14 @@ fn main(){
     // fen::parse("6k1/1b6/4n3/8/1n4B1/1B3N2/1N6/2b3K1 b - - 0 1", &mut main_board);
     // fen::parse("r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1", &mut main_board);
     // fen::parse("3rk2r/8/8/8/8/8/6p1/R3K2R b KQk - 0 1", &mut main_board);
-    fen::parse("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1", &mut main_board);
+    // fen::parse("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1", &mut main_board);
+    
+    square::plsmove(32, 42, &mut main_board);
 
-    /*
+    
     board::print(&main_board);
 
+    /*
     let hello = moves::_move::new(56, 77, 0, board::piece::r as u8, true, false, true);
     println!("from: {} to: {} promoted:{} EP:{}", moves::from(&hello), moves::to(&hello), moves::promoted(&hello),
     moves::castling(&hello));
@@ -56,9 +60,9 @@ fn main(){
     for x in 0..5 {
         print!("{}", moves::to_AN(&hello)[x]);
     }
-    */
     println!("");
 
+    */
     //main_board.side = board::black;
     moves::generator(&mut move_list, &main_board);
 
@@ -66,7 +70,7 @@ fn main(){
         for i in 0..5 {
             print!("{}", moves::to_AN(&move_list.all[x])[i]);
         }
-        if moves::captured(&move_list.all[x]) != 0 {
+        if moves::capture(&move_list.all[x]) != 0 {
             print!(" capture");
         }
         if moves::castling(&move_list.all[x]) {
@@ -74,6 +78,9 @@ fn main(){
         }
         if moves::en_passant(&move_list.all[x]) {
             print!(" en passant");
+        }
+        if moves::pawn_double(&move_list.all[x]) {
+            print!(" double");
         }
         println!("");
     }

@@ -40,7 +40,9 @@ pub fn hash(sboard: &board::chessboard) -> u64 {
 
     for i in 0..board::playable_size {
         unsafe {
-            hash ^= zobrist[sboard.layout[board::chocolate[i] as usize] as usize][i];
+            if sboard.layout[board::chocolate[i] as usize] != board::piece::Empty as u8 {
+                hash ^= zobrist[sboard.layout[board::chocolate[i] as usize] as usize][i];
+            }
         }
     }
 
@@ -62,4 +64,33 @@ pub fn hash(sboard: &board::chessboard) -> u64 {
     }
     
     return hash;
+}
+
+pub fn hash_square(target : u8, cboard: &mut board::chessboard) {
+    unsafe {
+        cboard.zobrist ^= zobrist[cboard.layout[target as usize] as usize][target as usize];
+    }
+}
+
+pub fn castle(cboard: &mut board::chessboard) {
+    unsafe {
+        cboard.zobrist ^= castling[cboard.castling as usize];
+    }
+}
+
+pub fn en_passant(cboard: &mut board::chessboard) {
+    if cboard.en_passant != board::void_square {
+        unsafe {
+            // mod 10 to find file
+            cboard.zobrist ^= EP[(cboard.en_passant % 10) as usize - 1]; 
+        }
+    }
+}
+
+pub fn sides(cboard: &mut board::chessboard) {
+    if cboard.side {
+        unsafe {
+            cboard.zobrist ^= side;
+        }
+    }
 }
