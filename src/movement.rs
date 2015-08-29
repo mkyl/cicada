@@ -8,7 +8,7 @@ pub fn make(m : &moves::_move, cboard : &mut board::chessboard) -> bool {
     let origin = moves::from(m);
     let target = moves::to(m);
 
-    let mut snapshot = board::snapshot{
+    let snapshot = board::snapshot{
         move_key: m.container,
         castling: cboard.castling,
         en_passant: cboard.en_passant,
@@ -79,6 +79,18 @@ pub fn make(m : &moves::_move, cboard : &mut board::chessboard) -> bool {
         _ => {;}
     }
 
+    match target {
+        25 => {cboard.castling &= !(board::castling_bits::K_cp as u8);
+               cboard.castling &= !(board::castling_bits::Q_cp as u8)},
+        28 =>  cboard.castling &= !(board::castling_bits::K_cp as u8),
+        21 =>  cboard.castling &= !(board::castling_bits::Q_cp as u8),
+        95 => {cboard.castling &= !(board::castling_bits::k_cp as u8);
+               cboard.castling &= !(board::castling_bits::q_cp as u8)},
+        98 =>  cboard.castling &= !(board::castling_bits::k_cp as u8),
+        91 =>  cboard.castling &= !(board::castling_bits::q_cp as u8),
+        _ => {;}
+    }
+
     cboard.side = !cboard.side;
     cboard.depth += 1;
     cboard.ply += 1;
@@ -90,7 +102,7 @@ pub fn make(m : &moves::_move, cboard : &mut board::chessboard) -> bool {
 
     debug_assert!(sanity::sane(cboard));
 
-    if cboard.side == board::white {
+    if cboard.side == board::black {
         if square::attacked(cboard.piece_list[board::piece::K as usize][0], board::black, cboard) {
             undo(cboard);
             return false;
@@ -132,7 +144,7 @@ pub fn undo(cboard : &mut board::chessboard) {
             23  => square::plsmove(24, 21, cboard), // white queenside
             97  => square::plsmove(96, 98, cboard), // black kingside
             93  => square::plsmove(94, 91, cboard), // black queenside
-            _ => {panic!("invalid castling");}
+            _ => unreachable!()
         }
     } 
 

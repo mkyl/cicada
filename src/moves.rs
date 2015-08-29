@@ -338,7 +338,7 @@ pub fn generator(list : &mut movelist, cboard : &board::chessboard) {
                     }
                 },
 
-                _ => {panic!("invalid piece");}
+                _ => unreachable!()
             }
         }
     }

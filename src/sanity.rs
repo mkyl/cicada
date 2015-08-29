@@ -129,7 +129,7 @@ pub fn perft(depth : i32, cboard : &mut board::chessboard) {
     moves::generator(&mut move_list, cboard);
    
     for x in 0..move_list.count as usize {
-        if ( !movement::make(&move_list.all[x], cboard) ) {
+        if !movement::make(&move_list.all[x], cboard) {
             continue
         }
         perft(depth - 1, cboard);
@@ -146,13 +146,11 @@ pub fn perft_test(depth: i32, cboard : &mut board::chessboard) {
     moves::generator(&mut move_list, cboard);
 
     for x in 0..move_list.count as usize {
-        if ( !movement::make(&move_list.all[x], cboard) ) {
+        if !movement::make(&move_list.all[x], cboard) {
             continue
         }
-        let cumnodes = leafnodes;
         perft(depth - 1, cboard);
         movement::undo(cboard);
-        let oldnodes = leafnodes - cumnodes;
     }
 
     println!("Test Complete: {} nodes", leafnodes);
