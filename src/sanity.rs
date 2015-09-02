@@ -105,6 +105,30 @@ fn verify_castle(cboard: &board::chessboard) {
     assert!(cboard.castling <= 15);
 }
 
+#[test]
+fn repetition() {
+    use fen;
+    use zobrist;
+    use think;
+    zobrist::init();
+    let mut main_board : board::chessboard = board::init();
+
+    fen::parse("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", &mut main_board);
+
+    movement::make(&moves::_move::new(22, 43, 0, 0, false, false, false), &mut main_board);
+    assert_eq!(think::repetition(&main_board), false);
+    movement::make(&moves::_move::new(92, 73, 0, 0, false, false, false), &mut main_board);
+    assert_eq!(think::repetition(&main_board), false);
+    movement::make(&moves::_move::new(43, 22, 0, 0, false, false, false), &mut main_board);
+    assert_eq!(think::repetition(&main_board), false);
+    movement::make(&moves::_move::new(73, 92, 0, 0, false, false, false), &mut main_board);
+    assert!(think::repetition(&main_board));
+    movement::make(&moves::_move::new(92, 73, 0, 0, false, false, false), &mut main_board);
+    assert!(think::repetition(&main_board));
+    movement::make(&moves::_move::new(73, 65, 0, 0, false, false, false), &mut main_board);
+    assert_eq!(think::repetition(&main_board), false);
+}
+
 pub fn sane(cboard: &board::chessboard) -> bool {
     let result : bool = true;
 
