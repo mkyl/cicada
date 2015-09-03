@@ -1,3 +1,5 @@
+use think;
+
 pub static mut chocolate : [u8; 64] = [0; 64];
 pub const full_board_size: usize = 120;
 pub const playable_size: usize = 64;
@@ -117,6 +119,7 @@ pub struct chessboard {
     pub side: bool,
 
     pub past: [snapshot; max_game_length],
+    pub transposition_table: think::transposition_table,
 
     pub zobrist: u64
 }
@@ -146,7 +149,8 @@ pub fn init() -> (chessboard) {
         en_passant: void_square,
         castling: 0,
         side: white,
-        past: unsafe { mem::zeroed() } ,
+        past: unsafe { mem::zeroed() },
+        transposition_table: think::transposition_table::new(),
         zobrist: 0
     }; 
 

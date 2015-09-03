@@ -6,3 +6,4 @@ authors = [ "Kayali" ]
 
 [dependencies]
 rand="0.3.10"
+time="0.1.32"

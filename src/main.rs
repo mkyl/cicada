@@ -3,6 +3,7 @@
 #![allow(non_upper_case_globals)]
 
 extern crate rand;
+extern crate time;
 
 mod board;
 mod zobrist;
@@ -16,6 +17,7 @@ mod think;
 fn main(){
     use board::chessboard;
 
+    /*
     println!{"
                 `-.  \\    .-'              ██████╗██╗ ██████╗ █████╗ ██████╗  █████╗  
         ,-`````\"\"-\\__ |  /                ██╔════╝██║██╔════╝██╔══██╗██╔══██╗██╔══██╗ 
@@ -24,15 +26,16 @@ fn main(){
          .-''      '-.__.-o`              ╚██████╗██║╚██████╗██║  ██║██████╔╝██║  ██║ 
         '-._____..-/`  |  \\                ╚═════╝╚═╝ ╚═════╝╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝ 
                 ,-'   /    `-.                                     \"Numbers Matter\""};
-
+    */
 
     // init order is important
     println!("\n Startup Sequence:");
 
-    println!(" [i] Initializing Zobrist Hash Tables");
+    println!(" [i] Initializing Zobrist Hashes");
     zobrist::init();
 
     println!(" [i] Initializing Chessboard");
+    println!(" [i] Initializing Transposition Tables");
     let mut main_board : chessboard = board::init();
 
     fen::parse("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", &mut main_board);
@@ -53,6 +56,28 @@ fn main(){
    
     // sanity::perft_test(6,  &mut main_board);
 
+    let move1 = moves::_move::new(22, 43, 0, 0, false, false, false);
+    think::store_transposition(move1.container, &mut main_board);
+    movement::make(&move1, &mut main_board);
+    let move2 = moves::_move::new(97, 78, 0, 0, false, false, false);
+    think::store_transposition(move2.container, &mut main_board);
+    movement::make(&move2, &mut main_board);
+    let move3 = moves::_move::new(35, 45, 0, 0, false, false, false);
+    think::store_transposition(move3.container, &mut main_board);
+    movement::make(&move3, &mut main_board);
+    let move4 = moves::_move::new(82, 72, 0, 0, false, false, false);
+    think::store_transposition(move4.container, &mut main_board);
+    movement::make(&move4, &mut main_board);
+/*
+    for x in 0..4 {
+        movement::undo(&mut main_board);
+        //let movec = moves::_move{container: think::find_transposition(&main_board), score:0};
+        //f movec.container != 1 {
+           // println!("from: {}, to: {}", moves::from(&movec), moves::to(&movec)) ;
+        } else {
+        }
+    }
+    */
     /*
     println!("from: {} to: {} promoted:{} EP:{}", moves::from(&hello), moves::to(&hello), moves::promoted(&hello),
     moves::castling(&hello));

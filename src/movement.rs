@@ -117,6 +117,9 @@ pub fn make(m : &moves::_move, cboard : &mut board::chessboard) -> bool {
 }
 
 pub fn undo(cboard : &mut board::chessboard) {
+    zobrist::sides(cboard);
+    zobrist::en_passant(cboard);
+    zobrist::castle(cboard);
     cboard.depth -= 1;
     cboard.ply -= 1;
     cboard.side = !cboard.side;
@@ -129,8 +132,9 @@ pub fn undo(cboard : &mut board::chessboard) {
     let target = moves::to(&move_);
     let origin = moves::from(&move_);
 
-    zobrist::en_passant(cboard);
     zobrist::sides(cboard);
+    zobrist::en_passant(cboard);
+    zobrist::castle(cboard);
 
     if moves::en_passant(&move_) {
         if cboard.side == board::white {

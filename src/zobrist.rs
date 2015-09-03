@@ -41,7 +41,7 @@ pub fn hash(sboard: &board::chessboard) -> u64 {
     for i in 0..board::playable_size {
         unsafe {
             if sboard.layout[board::chocolate[i] as usize] != board::piece::Empty as u8 {
-                hash ^= zobrist[sboard.layout[board::chocolate[i] as usize] as usize][i];
+                hash ^= zobrist[sboard.layout[board::chocolate[i] as usize] as usize][board::chocolate[i] as usize];
             }
         }
     }
@@ -68,7 +68,9 @@ pub fn hash(sboard: &board::chessboard) -> u64 {
 
 pub fn hash_square(target : u8, cboard: &mut board::chessboard) {
     unsafe {
-        cboard.zobrist ^= zobrist[cboard.layout[target as usize] as usize][target as usize];
+        if cboard.layout[target as usize] != board::piece::Empty as u8 {
+            cboard.zobrist ^= zobrist[cboard.layout[target as usize] as usize][target as usize];
+        }
     }
 }
 

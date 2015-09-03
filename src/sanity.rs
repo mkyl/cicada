@@ -54,6 +54,61 @@ fn hashing() {
 }
 
 #[test]
+fn move_make_hash() {
+    use fen;
+    use zobrist;
+    zobrist::init();
+    let mut main_board : board::chessboard = board::init();
+
+    fen::parse("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", &mut main_board);
+
+    let move1 = moves::_move::new(22, 43, 0, 0, false, false, false);
+    movement::make(&move1, &mut main_board);
+    assert_eq!(zobrist::hash(&main_board), main_board.zobrist);
+
+    let move2 = moves::_move::new(97, 78, 0, 0, false, false, false);
+    movement::make(&move2, &mut main_board);
+    assert_eq!(zobrist::hash(&main_board), main_board.zobrist);
+
+    let move3 = moves::_move::new(35, 45, 0, 0, false, false, false);
+    movement::make(&move3, &mut main_board);
+    assert_eq!(zobrist::hash(&main_board), main_board.zobrist);
+
+    let move4 = moves::_move::new(82, 72, 0, 0, false, false, false);
+    movement::make(&move4, &mut main_board);
+    assert_eq!(zobrist::hash(&main_board), main_board.zobrist);
+}
+
+#[test]
+fn move_undo_hash() {
+    use fen;
+    use zobrist;
+    zobrist::init();
+    let mut main_board : board::chessboard = board::init();
+
+    fen::parse("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", &mut main_board);
+
+    let move1 = moves::_move::new(22, 43, 0, 0, false, false, false);
+    movement::make(&move1, &mut main_board);
+    let move2 = moves::_move::new(97, 78, 0, 0, false, false, false);
+    movement::make(&move2, &mut main_board);
+    let move3 = moves::_move::new(35, 45, 0, 0, false, false, false);
+    movement::make(&move3, &mut main_board);
+    let move4 = moves::_move::new(82, 72, 0, 0, false, false, false);
+    movement::make(&move4, &mut main_board);
+
+    for x in 0..4 {
+        movement::undo(&mut main_board);
+        assert_eq!(zobrist::hash(&main_board), main_board.zobrist);
+    }
+}
+
+fn verify_hash(main_board : &board::chessboard) {
+    use zobrist;
+    assert_eq!(zobrist::hash(&main_board), main_board.zobrist);
+}
+
+#[test]
 fn piece_list() {
     use fen;
     use zobrist;
@@ -135,6 +190,7 @@ pub fn sane(cboard: &board::chessboard) -> bool {
      verify_squares(cboard);
      verify_pl(cboard);
      verify_castle(cboard);
+     verify_hash(cboard);
 
     result
 }
@@ -161,7 +217,7 @@ pub fn perft(depth : i32, cboard : &mut board::chessboard) {
     }
 }
 
-pub fn perft_test(depth: i32, cboard : &mut board::chessboard) {
+pub fn perft_test(depth: i32, cboard : &mut board::chessboard) -> f64 {
     unsafe {
     println!("Perft test to depth: {}", depth);
     leafnodes = 0f64;
@@ -178,5 +234,24 @@ pub fn perft_test(depth: i32, cboard : &mut board::chessboard) {
     }
 
     println!("Test Complete: {} nodes", leafnodes);
+    return leafnodes
     }
+}
+
+#[test]
+pub fn perft_suite() {
+    use fen;
+    use zobrist;
+    use think;
+    zobrist::init();
+    let mut main_board : board::chessboard = board::init();
+
+    fen::parse("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1", &mut main_board);
+    assert_eq!(perft_test(3,  &mut main_board), 97862f64);
+
+    fen::parse("n1n5/PPPk4/8/8/8/8/4Kppp/5N1N b - - 0 1", &mut main_board);
+    assert_eq!(perft_test(4,  &mut main_board), 182838f64);
+
+    fen::parse("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", &mut main_board);
+    assert_eq!(perft_test(4,  &mut main_board), 197281f64);
 }
