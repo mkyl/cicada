@@ -99,6 +99,12 @@ pub fn clear (target : u8, cboard : &mut board::chessboard) {
         }
     }
     cboard.piece_count[kind] -= 1;
+    if kind < 7 {
+        // white
+        cboard.score[0] -= board::piece_value[kind as usize];
+    } else {
+        cboard.score[1] -= board::piece_value[kind as usize];
+    }
 
     cboard.layout[target as usize] = board::piece::Empty as u8;
 }
@@ -110,6 +116,12 @@ pub fn add (target : u8, kind : u8, cboard : &mut board::chessboard) {
 
     cboard.piece_list[kind as usize][cboard.piece_count[kind as usize] as usize] = target;
     cboard.piece_count[kind as usize] += 1;
+    if kind < 7 {
+        // white
+        cboard.score[0] += board::piece_value[kind as usize];
+    } else {
+        cboard.score[1] += board::piece_value[kind as usize];
+    }
 
     // TODO could make this call cheaper
     zobrist::hash_square(target, cboard);

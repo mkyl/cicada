@@ -120,6 +120,7 @@ pub fn undo(cboard : &mut board::chessboard) {
     zobrist::sides(cboard);
     zobrist::en_passant(cboard);
     zobrist::castle(cboard);
+
     cboard.depth -= 1;
     cboard.ply -= 1;
     cboard.side = !cboard.side;

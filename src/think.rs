@@ -40,7 +40,7 @@ pub fn store_transposition(move_ : u32, cboard : &mut board::chessboard) {
     cboard.transposition_table.entries[i].move_ = move_;
 }
 
-pub fn find_transposition(cboard: &mut board::chessboard) -> u32 {
+pub fn find_transposition(cboard: &board::chessboard) -> u32 {
     let x = cboard.zobrist % hash_map_size as u64;
     let i = x as usize;
 
@@ -50,7 +50,6 @@ pub fn find_transposition(cboard: &mut board::chessboard) -> u32 {
     if cboard.zobrist == cboard.transposition_table.entries[i].hash {
         return cboard.transposition_table.entries[i].move_
     } else {
-        //println!("expected: {} \n found: {}", cboard.zobrist, cboard.transposition_table.entries[i].hash);
         return 1
     }
 }

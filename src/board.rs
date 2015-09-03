@@ -8,6 +8,7 @@ const max_game_length: usize = 1024;
 pub const white: bool = false;
 pub const black: bool = true;
 pub const AN_pieces: [char; 13] = ['x', 'k', 'q', 'r', 'b', 'n', 'p', 'k', 'q', 'r', 'b', 'n', 'p'];
+pub const piece_value: [i32; 13] = [0, 31337, 900, 500, 300, 300, 100, 31337, 900, 500, 300, 300, 100];
 
 pub enum piece {
     Empty,
@@ -24,24 +25,6 @@ pub enum piece {
     n,
     p
 }
-
-/*
-pub enum value {
-    Empty,
-    K = 14,
-    Q = 9,
-    R = 5,
-    B = 3,
-    N = 3,
-    P = 1,
-    k = 14,
-    q = 9,
-    r = 5,
-    b = 3,
-    n = 3,
-    p = 1
-}
-*/
 
 pub enum file {
     file_a,
@@ -103,7 +86,7 @@ pub struct chessboard {
     pub layout: [u8; full_board_size],
     pub piece_count: [u8; 13],
     pub piece_list: [[u8; 10]; 13],
-    pub score: [u8; 2],
+    pub score: [i32; 2],
 
     // number of half moves
     // engine has looked ahead
@@ -244,6 +227,12 @@ pub fn update_pieces (cboard: &mut chessboard) {
             if piece != piece::Empty as u8 {
                 cboard.piece_list[piece as usize][cboard.piece_count[piece as usize] as usize] = index;
                 cboard.piece_count[piece as usize] += 1;
+                if piece < 7 {
+                    // white
+                    cboard.score[0] += piece_value[piece as usize];
+                } else {
+                    cboard.score[1] += piece_value[piece as usize];
+                }
             }
         }
     }

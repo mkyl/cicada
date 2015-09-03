@@ -55,6 +55,7 @@ fn main(){
     // fen::parse("r4rk1/1pp1qppp/p1np1n2/2b1p1B1/2B1P1b1/P1NP1N2/1PP1QPPP/R4RK1 w - - 0 10", &mut main_board);
    
     // sanity::perft_test(6,  &mut main_board);
+    println!("materials: {} {}", main_board.score[0], main_board.score[1]);
 
     let move1 = moves::_move::new(22, 43, 0, 0, false, false, false);
     think::store_transposition(move1.container, &mut main_board);
@@ -68,16 +69,14 @@ fn main(){
     let move4 = moves::_move::new(82, 72, 0, 0, false, false, false);
     think::store_transposition(move4.container, &mut main_board);
     movement::make(&move4, &mut main_board);
-/*
     for x in 0..4 {
         movement::undo(&mut main_board);
-        //let movec = moves::_move{container: think::find_transposition(&main_board), score:0};
-        //f movec.container != 1 {
-           // println!("from: {}, to: {}", moves::from(&movec), moves::to(&movec)) ;
+        let movec = moves::_move{container: think::find_transposition(&main_board), score:0};
+        if movec.container != 1 {
+           println!("from: {}, to: {}", moves::from(&movec), moves::to(&movec)) ;
         } else {
         }
     }
-    */
     /*
     println!("from: {} to: {} promoted:{} EP:{}", moves::from(&hello), moves::to(&hello), moves::promoted(&hello),
     moves::castling(&hello));
