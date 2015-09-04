@@ -4,11 +4,15 @@ pub static mut chocolate : [u8; 64] = [0; 64];
 pub const full_board_size: usize = 120;
 pub const playable_size: usize = 64;
 pub const void_square: u8 = 100; 
-const max_game_length: usize = 1024;
+pub const max_game_length: usize = 1024;
 pub const white: bool = false;
 pub const black: bool = true;
 pub const AN_pieces: [char; 13] = ['x', 'k', 'q', 'r', 'b', 'n', 'p', 'k', 'q', 'r', 'b', 'n', 'p'];
-pub const piece_value: [i32; 13] = [0, 31337, 900, 500, 300, 300, 100, 31337, 900, 500, 300, 300, 100];
+pub const piece_value: [i32; 13] = [0, 31337, 900, 500, 330, 320, 100, 31337, 900, 500, 330, 320, 100];
+
+// standard FEN notation:
+// capitals = white
+// small = black
 
 pub enum piece {
     Empty,
