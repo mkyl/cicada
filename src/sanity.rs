@@ -62,19 +62,19 @@ fn move_make_hash() {
 
     fen::parse("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", &mut main_board);
 
-    let move1 = moves::_move::new(22, 43, 0, 0, false, false, false);
+    let move1 = moves::_move::new(22, 43, 0, 0, false, false, false, 0);
     movement::make(&move1, &mut main_board);
     assert_eq!(zobrist::hash(&main_board), main_board.zobrist);
 
-    let move2 = moves::_move::new(97, 78, 0, 0, false, false, false);
+    let move2 = moves::_move::new(97, 78, 0, 0, false, false, false, 0);
     movement::make(&move2, &mut main_board);
     assert_eq!(zobrist::hash(&main_board), main_board.zobrist);
 
-    let move3 = moves::_move::new(35, 45, 0, 0, false, false, false);
+    let move3 = moves::_move::new(35, 45, 0, 0, false, false, false, 0);
     movement::make(&move3, &mut main_board);
     assert_eq!(zobrist::hash(&main_board), main_board.zobrist);
 
-    let move4 = moves::_move::new(82, 72, 0, 0, false, false, false);
+    let move4 = moves::_move::new(82, 72, 0, 0, false, false, false, 0);
     movement::make(&move4, &mut main_board);
     assert_eq!(zobrist::hash(&main_board), main_board.zobrist);
 }
@@ -88,13 +88,13 @@ fn move_undo_hash() {
 
     fen::parse("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", &mut main_board);
 
-    let move1 = moves::_move::new(22, 43, 0, 0, false, false, false);
+    let move1 = moves::_move::new(22, 43, 0, 0, false, false, false, 0);
     movement::make(&move1, &mut main_board);
-    let move2 = moves::_move::new(97, 78, 0, 0, false, false, false);
+    let move2 = moves::_move::new(97, 78, 0, 0, false, false, false, 0);
     movement::make(&move2, &mut main_board);
-    let move3 = moves::_move::new(35, 45, 0, 0, false, false, false);
+    let move3 = moves::_move::new(35, 45, 0, 0, false, false, false, 0);
     movement::make(&move3, &mut main_board);
-    let move4 = moves::_move::new(82, 72, 0, 0, false, false, false);
+    let move4 = moves::_move::new(82, 72, 0, 0, false, false, false, 0);
     movement::make(&move4, &mut main_board);
 
     for x in 0..4 {
@@ -170,17 +170,17 @@ fn repetition() {
 
     fen::parse("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", &mut main_board);
 
-    movement::make(&moves::_move::new(22, 43, 0, 0, false, false, false), &mut main_board);
+    movement::make(&moves::_move::new(22, 43, 0, 0, false, false, false,0), &mut main_board);
     assert_eq!(think::repetition(&main_board), false);
-    movement::make(&moves::_move::new(92, 73, 0, 0, false, false, false), &mut main_board);
+    movement::make(&moves::_move::new(92, 73, 0, 0, false, false, false, 0), &mut main_board);
     assert_eq!(think::repetition(&main_board), false);
-    movement::make(&moves::_move::new(43, 22, 0, 0, false, false, false), &mut main_board);
+    movement::make(&moves::_move::new(43, 22, 0, 0, false, false, false, 0), &mut main_board);
     assert_eq!(think::repetition(&main_board), false);
-    movement::make(&moves::_move::new(73, 92, 0, 0, false, false, false), &mut main_board);
+    movement::make(&moves::_move::new(73, 92, 0, 0, false, false, false, 0), &mut main_board);
     assert!(think::repetition(&main_board));
-    movement::make(&moves::_move::new(92, 73, 0, 0, false, false, false), &mut main_board);
+    movement::make(&moves::_move::new(92, 73, 0, 0, false, false, false, 0), &mut main_board);
     assert!(think::repetition(&main_board));
-    movement::make(&moves::_move::new(73, 65, 0, 0, false, false, false), &mut main_board);
+    movement::make(&moves::_move::new(73, 65, 0, 0, false, false, false, 0), &mut main_board);
     assert_eq!(think::repetition(&main_board), false);
 }
 

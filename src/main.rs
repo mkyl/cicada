@@ -40,9 +40,9 @@ fn main(){
 
     // fen::parse("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", &mut main_board);
     // fen::parse("2rr3k/pp3pp1/1nnqbN1p/3pN3/2pP4/2P3Q1/PPB4P/R4RK1 w - - 0 1", &mut main_board);
-    fen::parse("3r1r2/1pp2p1k/p5pp/4P3/2nP3R/2P3QP/P1B1q1P1/5RK1 w - - 0 1", &mut main_board);
+    // fen::parse("3r1r2/1pp2p1k/p5pp/4P3/2nP3R/2P3QP/P1B1q1P1/5RK1 w - - 0 1", &mut main_board);
     // fen::parse("3R4/5K2/8/4k1P1/4p3/7B/4p3/8 b - - 1 0", &mut main_board);
-    // fen::parse("rnbqkb1r/pp1p1pPp/8/2p1pP2/1P1P4/3P3P/P1P1P3/RNBQKBNR w KQkq e6 0 1", &mut main_board);
+    fen::parse("r1b1k2r/ppppnppp/2n2q2/2b5/3NP3/2P1B3/PP3PPP/RN1QKB1R w KQkq - 0 1", &mut main_board);
     // fen::parse("qrbnkbnr/p1p1p3/3p3p/1p1p4/2P1Pp2/8/PP1P1PpP/QRBNKB1R b KQkq e3 0 1", &mut main_board);
     // fen::parse("5k2/1n6/4n3/6N1/8/3N4/8/5K2 w - - 0 1", &mut main_board);
     // fen::parse("6k1/8/5r2/8/1nR5/5N2/8/6K1 w - - 0 1", &mut main_board);
@@ -59,14 +59,16 @@ fn main(){
    
     // sanity::perft_test(6,  &mut main_board);
 
-    let look = 4;
+    let look = 5;
     think::start(&mut main_board, look, 0);
 
+    println!("best move:");
     for x in 0..look {
         let movec = moves::_move{container: think::find_transposition(&main_board), score:0};
-        println!("best move -> from: {}{}, to: {}{}", board::to_AN(moves::from(&movec))[0], board::to_AN(moves::from(&movec))[1], board::to_AN(moves::to(&movec))[0], board::to_AN(moves::to(&movec))[1]); 
+        print!("{}{}{}{} ", board::to_AN(moves::from(&movec))[0], board::to_AN(moves::from(&movec))[1], board::to_AN(moves::to(&movec))[0], board::to_AN(moves::to(&movec))[1]); 
         movement::make(&movec, &mut main_board);
     }
+    print!("\n");
 
     /*
     let move1 = moves::_move::new(22, 43, 0, 0, false, false, false);

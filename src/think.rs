@@ -270,12 +270,13 @@ pub fn start(cboard: &mut board::chessboard, depth_target: u8, think_time:u16) {
     println!("\nstarting search search to depth: {}\n", depth_target);
 
     for depth in 1..depth_target+1 {
-        score = alpha_beta(-inf, inf, depth, cboard);
-        println!("depth iteration: {}, score: {}", depth, score);
+        let mut node = 0f64;
+        score = alpha_beta(-inf, inf, depth, cboard, &mut node);
+        println!("depth iteration: {}, score: {}, nodes: {}", depth, score, node);
     }
 }
 
-fn alpha_beta(alpha: i32, beta: i32, depth: u8, cboard: &mut board::chessboard) -> i32 {
+fn alpha_beta(alpha: i32, beta: i32, depth: u8, cboard: &mut board::chessboard, node : &mut f64) -> i32 {
     use std::i32;
     if depth == 0 {
         return evaluate(cboard)
@@ -298,16 +299,22 @@ fn alpha_beta(alpha: i32, beta: i32, depth: u8, cboard: &mut board::chessboard) 
     let mut move_list : moves::movelist =  moves::movelist::new();
     moves::generator(&mut move_list, cboard);
 
+
     for index in 0..move_list.count as usize {
+        optimize_mvv_lva(index, &mut move_list);
+
         if !movement::make(&move_list.all[index], cboard) {
             continue
         }
+
+
+        *node += 1f64;
 
         if illegal == true {
             illegal = false;
         }
 
-        score = -alpha_beta(-beta, -new_alpha, depth - 1, cboard);
+        score = -alpha_beta(-beta, -new_alpha, depth - 1, cboard, node);
         movement::undo(cboard);
 
         if score > new_alpha {
@@ -343,4 +350,23 @@ fn alpha_beta(alpha: i32, beta: i32, depth: u8, cboard: &mut board::chessboard) 
     }
     
     return new_alpha
+}
+
+fn optimize_mvv_lva(index : usize, list : &mut moves::movelist) {
+    let mut max_score = list.all[index].score;
+    let mut max_index = index;
+    let old_move = moves::_move{
+        container: list.all[index].container,
+        score: list.all[index].score};
+
+    for x in index .. list.count as usize {
+        if list.all[x].score > max_score {
+            max_score = list.all[x].score;
+            max_index = x;
+        }
+    }
+
+    list.all[index].score = list.all[max_index].score;
+    list.all[index].container = list.all[max_index].container;
+    list.all[max_index] = old_move;
 }
