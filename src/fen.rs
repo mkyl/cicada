@@ -1,7 +1,7 @@
 use board;
 use zobrist;
 
-pub fn parse(fen : &'static str, cboard: &mut board::chessboard) {
+pub fn parse(fen : &str, cboard: &mut board::chessboard) {
     use board::castling_bits;
     use board::piece;
     use board::rank;

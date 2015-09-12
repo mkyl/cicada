@@ -4,6 +4,7 @@ use square;
 const max_moves : usize = 256;
 const around : [i8; 2] = [1, -1];
 const MVV : [u16; 13] = [0, 0, 5000, 4000, 3000, 2000, 1000, 0, 5000, 4000, 3000, 2000, 1000]; 
+const AN_pieces: [char; 13] = ['x', 'k', 'q', 'r', 'b', 'n', 'p', 'k', 'q', 'r', 'b', 'n', 'p'];
 
 pub struct _move {
     /* 0000 0000 0000 0000 0000 0000 0000
@@ -88,7 +89,7 @@ pub fn to_AN(m : &_move) -> [char; 5]{
     result[3] = board::to_AN(to(m))[1];
 
     if promoted(m) != 0 {
-        result[4] = board::AN_pieces[promoted(m) as usize];
+        result[4] = AN_pieces[promoted(m) as usize];
     }
 
     result

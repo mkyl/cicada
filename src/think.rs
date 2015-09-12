@@ -261,23 +261,18 @@ fn evaluate (cboard: &board::chessboard) -> i32 {
 }
 
 pub fn start(cboard: &mut board::chessboard, depth_target: u8, think_time:u16) {
-    use std::i32;
-
     let mut best : u32 = 0;
     let mut score = 0;
     cboard.ply = 0;
 
-    println!("\nstarting search search to depth: {}\n", depth_target);
-
     for depth in 1..depth_target+1 {
         let mut node = 0f64;
         score = alpha_beta(-inf, inf, depth, cboard, &mut node);
-        println!("depth iteration: {}, score: {}, nodes: {}", depth, score, node);
+        println!("info depth {} cp {} nodes {}", depth, score, node);
     }
 }
 
 fn alpha_beta(alpha: i32, beta: i32, depth: u8, cboard: &mut board::chessboard, node : &mut f64) -> i32 {
-    use std::i32;
     if depth == 0 {
         return evaluate(cboard)
     }

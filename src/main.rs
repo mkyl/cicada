@@ -13,11 +13,11 @@ mod moves;
 mod movement;
 mod sanity;
 mod think;
+mod uci;
 
 fn main(){
     use board::chessboard;
 
-    /*
     println!{"
                 `-.  \\    .-'              ██████╗██╗ ██████╗ █████╗ ██████╗  █████╗  
         ,-`````\"\"-\\__ |  /                ██╔════╝██║██╔════╝██╔══██╗██╔══██╗██╔══██╗ 
@@ -26,7 +26,6 @@ fn main(){
          .-''      '-.__.-o`              ╚██████╗██║╚██████╗██║  ██║██████╔╝██║  ██║ 
         '-._____..-/`  |  \\                ╚═════╝╚═╝ ╚═════╝╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝ 
                 ,-'   /    `-.                                     \"Numbers Matter\""};
-    */
 
     // init order is important
     println!("\n Startup Sequence:");
@@ -36,7 +35,13 @@ fn main(){
 
     println!(" [i] Initializing Chessboard");
     println!(" [i] Initializing Transposition Tables");
-    let mut main_board : chessboard = board::init();
+    let mut cboard : chessboard = board::init();
+
+    println!(" [✓] Startup Successful\n");
+
+    uci::looping(&mut cboard);
+
+    /*
 
     // fen::parse("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", &mut main_board);
     // fen::parse("2rr3k/pp3pp1/1nnqbN1p/3pN3/2pP4/2P3Q1/PPB4P/R4RK1 w - - 0 1", &mut main_board);
@@ -56,8 +61,6 @@ fn main(){
     // fen::parse("n1n5/PPPk4/8/8/8/8/4Kppp/5N1N b - - 0 1", &mut main_board);
     // fen::parse("r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1", &mut main_board);
     // fen::parse("r4rk1/1pp1qppp/p1np1n2/2b1p1B1/2B1P1b1/P1NP1N2/1PP1QPPP/R4RK1 w - - 0 10", &mut main_board);
-   
-    // sanity::perft_test(6,  &mut main_board);
 
     let look = 5;
     think::start(&mut main_board, look, 0);
@@ -69,7 +72,7 @@ fn main(){
         movement::make(&movec, &mut main_board);
     }
     print!("\n");
-
+*/
     /*
     let move1 = moves::_move::new(22, 43, 0, 0, false, false, false);
     movement::make(&move1, &mut main_board);

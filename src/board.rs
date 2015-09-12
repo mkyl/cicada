@@ -7,7 +7,6 @@ pub const void_square: u8 = 100;
 pub const max_game_length: usize = 1024;
 pub const white: bool = false;
 pub const black: bool = true;
-pub const AN_pieces: [char; 13] = ['x', 'k', 'q', 'r', 'b', 'n', 'p', 'k', 'q', 'r', 'b', 'n', 'p'];
 pub const piece_value: [i32; 13] = [0, 31337, 900, 500, 330, 320, 100, 31337, 900, 500, 330, 320, 100];
 
 // standard FEN notation:
@@ -31,15 +30,8 @@ pub enum piece {
 }
 
 pub enum file {
-    file_a,
-    file_b,
-    file_c,
-    file_d,
-    file_e,
-    file_f,
-    file_g,
-    file_h,
-    invalid_file
+    file_a = 0,
+    file_h = 7,
 }
 
 pub enum rank {
