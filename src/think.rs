@@ -143,7 +143,7 @@ pub struct transposition_table {
 impl transposition_table {
     pub fn new() -> transposition_table {
         let mut vector = Vec::new();
-        for x in 0..hash_map_size {
+        for _ in 0..hash_map_size {
             vector.push(transposition::empty());
         }
         transposition_table{
@@ -264,12 +264,22 @@ pub fn start(cboard: &mut board::chessboard, depth_target: u8, think_time:u16) {
     let mut best : u32 = 0;
     let mut score = 0;
     cboard.ply = 0;
+    let start = time::PreciseTime::now();
 
     for depth in 1..depth_target+1 {
         let mut node = 0f64;
         score = alpha_beta(-inf, inf, depth, cboard, &mut node);
         println!("info depth {} cp {} nodes {}", depth, score, node);
     }
+
+    let bestmove = moves::_move{container: find_transposition(cboard), score:0};
+    print!("bestmove ");
+    let move_ = moves::to_AN(&bestmove);
+    for x in 0..5 {
+        print!("{}",move_[x]);
+    }
+    print!("\n");
+
 }
 
 fn alpha_beta(alpha: i32, beta: i32, depth: u8, cboard: &mut board::chessboard, node : &mut f64) -> i32 {

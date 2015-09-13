@@ -28,6 +28,7 @@ pub fn looping(cboard : &mut board::chessboard) {
             parse_position(&input, cboard);
         }
         else if input.split_whitespace().any(|x| x == "go") {
+            parse_search(&input, cboard);
         }
         else if input.split_whitespace().any(|x| x == "quit") {
             break
@@ -51,6 +52,7 @@ fn parse_position(input : &str, cboard : &mut board::chessboard) {
 
     if v[1] == "startpos" {
         fen::parse(&"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", cboard);
+        parse_moves(&v, 2, cboard);
     } else if v[1] == "fen" {
         let mut fen_code = v[2].to_string();
 
@@ -59,7 +61,65 @@ fn parse_position(input : &str, cboard : &mut board::chessboard) {
         }
 
         fen::parse(&fen_code, cboard);
+        parse_moves(&v, 8, cboard);
     }
 
     board::print(cboard);
+}
+
+fn parse_moves(input : &Vec<&str>, input_index : usize, cboard : &mut board::chessboard) {
+    use moves;
+    use movement;
+
+    for index in input_index + 1..input.len() {
+        let move_str = input[index].as_bytes();
+        let mut move_ = moves::_move{container: 0, score: 0};
+
+        let from = board::AN_to_board(move_str[0] - 'a' as u8, move_str[1] - '1' as u8);
+        let to   = board::AN_to_board(move_str[2] - 'a' as u8, move_str[3] - '1' as u8);
+        if move_str.len() == 5 {
+            /*
+            match move_str[5] {
+            }
+            */
+        } else  {
+            move_ = moves::_move::new(from, to, 0, 0, false, false, false, 0);
+        }
+
+        println!("reading: {}, from:{}, to:{}", input[index], from, to);
+        assert!(movement::make(&move_, cboard));
+    }
+}
+
+fn parse_search(input : &str, cboard : &mut board::chessboard) {
+    use think;
+
+    let v: Vec<&str> = input.split_whitespace().collect();
+    let mut time = 0;
+    let mut depth = 0;
+
+    if cboard.side == board::white {
+        for x in 0..v.len() {
+            if v[x] == "wtime" {
+                time = v[x + 1].parse::<u16>().unwrap();
+            }
+        }
+    } else {
+        for x in 0..v.len() {
+            if v[x] == "btime" {
+                time = v[x + 1].parse::<u16>().unwrap();
+            }
+        }
+    }
+
+    for x in 0..v.len() {
+        if v[x] == "depth" {
+            depth = v[x + 1].parse::<u8>().unwrap();
+        }
+    }
+
+    println!("time: {}, depth: {}", time, depth);
+    if time != 0 || depth != 0 {
+        think::start(cboard, depth, time); 
+    }
 }
