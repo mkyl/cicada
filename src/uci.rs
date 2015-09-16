@@ -77,14 +77,29 @@ fn parse_moves(input : &Vec<&str>, input_index : usize, cboard : &mut board::che
 
         let from = board::AN_to_board(move_str[0] - 'a' as u8, move_str[1] - '1' as u8);
         let to   = board::AN_to_board(move_str[2] - 'a' as u8, move_str[3] - '1' as u8);
+        let mut prom : u8 = 0;
+
         if move_str.len() == 5 {
-            /*
-            match move_str[5] {
+            if cboard.side == board::white {
+                match move_str[4] as char{
+                    'q' => prom = board::piece::Q as u8,
+                    'r' => prom = board::piece::R as u8,
+                    'b' => prom = board::piece::B as u8,
+                    'n' => prom = board::piece::N as u8,
+                    _   => unreachable!()
+                }
+            } else {
+                match move_str[4] as char{
+                    'q' => prom = board::piece::q as u8,
+                    'r' => prom = board::piece::r as u8,
+                    'b' => prom = board::piece::b as u8,
+                    'n' => prom = board::piece::n as u8,
+                    _   => unreachable!()
+                }
             }
-            */
-        } else  {
-            move_ = moves::_move::new(from, to, 0, 0, false, false, false, 0);
         }
+
+        move_ = moves::_move::new(from, to, 0, prom, false, false, false, 0);
 
         println!("reading: {}, from:{}, to:{}", input[index], from, to);
         assert!(movement::make(&move_, cboard));
@@ -101,13 +116,13 @@ fn parse_search(input : &str, cboard : &mut board::chessboard) {
     if cboard.side == board::white {
         for x in 0..v.len() {
             if v[x] == "wtime" {
-                time = v[x + 1].parse::<u16>().unwrap();
+                time = v[x + 1].parse::<i64>().unwrap();
             }
         }
     } else {
         for x in 0..v.len() {
             if v[x] == "btime" {
-                time = v[x + 1].parse::<u16>().unwrap();
+                time = v[x + 1].parse::<i64>().unwrap();
             }
         }
     }

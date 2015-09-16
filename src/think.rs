@@ -260,16 +260,30 @@ fn evaluate (cboard: &board::chessboard) -> i32 {
     }
 }
 
-pub fn start(cboard: &mut board::chessboard, depth_target: u8, think_time:u16) {
+pub fn start(cboard: &mut board::chessboard, depth_target: u8, think_time:i64) {
+    use std::u8;
+
     let mut best : u32 = 0;
     let mut score = 0;
     cboard.ply = 0;
-    let start = time::PreciseTime::now();
 
-    for depth in 1..depth_target+1 {
+    let mut end = time::SteadyTime::now() + time::Duration::milliseconds(think_time);
+    let mut target = depth_target;
+
+    if think_time == 0 {
+        end = time::SteadyTime::now() + time::Duration::weeks(1);
+    }
+
+    if depth_target == 0 {
+        target = u8::MAX - 1;
+    }
+
+    for depth in 1..target+1 {
         let mut node = 0f64;
-        score = alpha_beta(-inf, inf, depth, cboard, &mut node);
-        println!("info depth {} cp {} nodes {}", depth, score, node);
+        score = alpha_beta(-inf, inf, depth, cboard, &mut node, end);
+        if node != 0f64 {
+            println!("info depth {} cp {} nodes {}", depth, score, node);
+        }
     }
 
     let bestmove = moves::_move{container: find_transposition(cboard), score:0};
@@ -282,9 +296,13 @@ pub fn start(cboard: &mut board::chessboard, depth_target: u8, think_time:u16) {
 
 }
 
-fn alpha_beta(alpha: i32, beta: i32, depth: u8, cboard: &mut board::chessboard, node : &mut f64) -> i32 {
+fn alpha_beta(alpha: i32, beta: i32, depth: u8, cboard: &mut board::chessboard, node : &mut f64, end : time::SteadyTime) -> i32 {
     if depth == 0 {
         return evaluate(cboard)
+    }
+
+    if time::SteadyTime::now() > end {
+        return 0
     }
 
     let mut new_alpha = alpha;
@@ -319,7 +337,7 @@ fn alpha_beta(alpha: i32, beta: i32, depth: u8, cboard: &mut board::chessboard, 
             illegal = false;
         }
 
-        score = -alpha_beta(-beta, -new_alpha, depth - 1, cboard, node);
+        score = -alpha_beta(-beta, -new_alpha, depth - 1, cboard, node, end);
         movement::undo(cboard);
 
         if score > new_alpha {
