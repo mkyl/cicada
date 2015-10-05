@@ -73,35 +73,8 @@ fn parse_moves(input : &Vec<&str>, input_index : usize, cboard : &mut board::che
 
     for index in input_index + 1..input.len() {
         let move_str = input[index].as_bytes();
-        let mut move_ = moves::_move{container: 0, score: 0};
+        let mut move_ = moves::from_AN(move_str, cboard);
 
-        let from = board::AN_to_board(move_str[0] - 'a' as u8, move_str[1] - '1' as u8);
-        let to   = board::AN_to_board(move_str[2] - 'a' as u8, move_str[3] - '1' as u8);
-        let mut prom : u8 = 0;
-
-        if move_str.len() == 5 {
-            if cboard.side == board::white {
-                match move_str[4] as char{
-                    'q' => prom = board::piece::Q as u8,
-                    'r' => prom = board::piece::R as u8,
-                    'b' => prom = board::piece::B as u8,
-                    'n' => prom = board::piece::N as u8,
-                    _   => unreachable!()
-                }
-            } else {
-                match move_str[4] as char{
-                    'q' => prom = board::piece::q as u8,
-                    'r' => prom = board::piece::r as u8,
-                    'b' => prom = board::piece::b as u8,
-                    'n' => prom = board::piece::n as u8,
-                    _   => unreachable!()
-                }
-            }
-        }
-
-        move_ = moves::_move::new(from, to, 0, prom, false, false, false, 0);
-
-        println!("reading: {}, from:{}, to:{}", input[index], from, to);
         assert!(movement::make(&move_, cboard));
     }
 }

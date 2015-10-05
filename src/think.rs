@@ -8,6 +8,8 @@ use time;
 const hash_map_size : usize = 0x100000;
 const inf : i32 = 100000;
 
+static mut time_up : bool = false;
+
 // TODO src https://chessprogramming.wikispaces.com/Simplified+evaluation+function
 
 const black_pawn_piece_square : [i32; 120] =
@@ -168,34 +170,7 @@ pub fn find_transposition(cboard: &board::chessboard) -> u32 {
     if cboard.zobrist == cboard.transposition_table.entries[i].hash {
         return cboard.transposition_table.entries[i].move_
     } else {
-        println!(" [!] hash miss");
         return 0
-    }
-}
-
-pub struct search {
-    depth_target: u8,
-    depth: u8,
-    leaves: f64,
-
-    think_time: u16,
-    begin: time::PreciseTime,
-    end: time::PreciseTime
-}
-
-impl search {
-    pub fn new(time : u16, ply: u8) -> search {
-
-        search{
-            depth_target: ply,
-            depth: 0,
-            leaves: 0f64,
-
-            think_time: time,
-            begin: time::PreciseTime::now(),
-            // TODO really unefficient
-            end: time::PreciseTime::now()
-        }
     }
 }
 
@@ -267,8 +242,10 @@ pub fn start(cboard: &mut board::chessboard, depth_target: u8, think_time:i64) {
     let mut score = 0;
     cboard.ply = 0;
 
-    let mut end = time::SteadyTime::now() + time::Duration::milliseconds(think_time);
+    let mut end = time::SteadyTime::now() + time::Duration::milliseconds((think_time/30) - 75);
     let mut target = depth_target;
+
+    unsafe { time_up = false; }
 
     if think_time == 0 {
         end = time::SteadyTime::now() + time::Duration::weeks(1);
@@ -279,10 +256,12 @@ pub fn start(cboard: &mut board::chessboard, depth_target: u8, think_time:i64) {
     }
 
     for depth in 1..target+1 {
-        let mut node = 0f64;
+        let mut node : u64 = 0;
         score = alpha_beta(-inf, inf, depth, cboard, &mut node, end);
-        if node != 0f64 {
-            println!("info depth {} cp {} nodes {}", depth, score, node);
+        if node != 0 {
+            print!("info depth {} score cp {} nodes {}", depth, score, node);
+            print_pv(cboard, depth as usize);
+            print!("\n");
         }
     }
 
@@ -296,13 +275,21 @@ pub fn start(cboard: &mut board::chessboard, depth_target: u8, think_time:i64) {
 
 }
 
-fn alpha_beta(alpha: i32, beta: i32, depth: u8, cboard: &mut board::chessboard, node : &mut f64, end : time::SteadyTime) -> i32 {
+fn alpha_beta(alpha: i32, beta: i32, depth: u8, cboard: &mut board::chessboard, node : &mut u64, end : time::SteadyTime) -> i32 {
     if depth == 0 {
-        return evaluate(cboard)
+       // return evaluate(cboard);
+       return quiescence(alpha, beta, cboard);
     }
 
-    if time::SteadyTime::now() > end {
+    if *node % 10000 == 0 && time::SteadyTime::now() > end {
+        unsafe { time_up = true; }
         return 0
+    }
+
+    unsafe {
+        if time_up {
+            return 0
+        }
     }
 
     let mut new_alpha = alpha;
@@ -322,6 +309,16 @@ fn alpha_beta(alpha: i32, beta: i32, depth: u8, cboard: &mut board::chessboard, 
     let mut move_list : moves::movelist =  moves::movelist::new();
     moves::generator(&mut move_list, cboard);
 
+    let pv = moves::_move{container: find_transposition(cboard), score: 0};
+
+    if pv.container != 0 {
+        for b in 0..move_list.count as usize {
+            if move_list.all[b].container == pv.container {
+                move_list.all[b].score = 40000;
+                break
+            }
+        }
+    }
 
     for index in 0..move_list.count as usize {
         optimize_mvv_lva(index, &mut move_list);
@@ -330,8 +327,7 @@ fn alpha_beta(alpha: i32, beta: i32, depth: u8, cboard: &mut board::chessboard, 
             continue
         }
 
-
-        *node += 1f64;
+        *node += 1;
 
         if illegal == true {
             illegal = false;
@@ -375,6 +371,62 @@ fn alpha_beta(alpha: i32, beta: i32, depth: u8, cboard: &mut board::chessboard, 
     return new_alpha
 }
 
+fn quiescence(alpha: i32, beta: i32, cboard: &mut board::chessboard) -> i32 {
+    if (repetition(cboard) || cboard.fifty > 99) && cboard.ply > 0 {
+        return 0
+    }
+
+    if cboard.depth == board::max_game_length as u16 - 1 {
+        return evaluate(cboard)
+    }
+
+    let eval = evaluate(cboard);
+
+    let mut new_alpha = alpha;
+    let stale_alpha = alpha;
+    let mut illegal = true;
+    let mut move_ = 0;
+    let mut score = -inf;
+
+    if eval >= beta {
+        return beta
+    }
+
+    if eval > alpha {
+        new_alpha = eval;
+    }
+
+    let mut move_list : moves::movelist =  moves::movelist::new();
+    moves::generator(&mut move_list, cboard);
+
+    for index in 0..move_list.count as usize {
+        if moves::capture(&move_list.all[index]) != 0 {
+            optimize_mvv_lva(index, &mut move_list);
+
+            if !movement::make(&move_list.all[index], cboard) {
+                continue
+            }
+
+            if illegal == true {
+                illegal = false;
+            }
+
+            score = -quiescence(-beta, -new_alpha, cboard);
+            movement::undo(cboard);
+
+            if score > new_alpha {
+                if score >= beta {
+                    return beta
+                }
+                new_alpha = score;
+                move_ = move_list.all[index].container;
+            }
+        }
+    }
+
+    return new_alpha
+}
+
 fn optimize_mvv_lva(index : usize, list : &mut moves::movelist) {
     let mut max_score = list.all[index].score;
     let mut max_index = index;
@@ -392,4 +444,28 @@ fn optimize_mvv_lva(index : usize, list : &mut moves::movelist) {
     list.all[index].score = list.all[max_index].score;
     list.all[index].container = list.all[max_index].container;
     list.all[max_index] = old_move;
+}
+
+fn print_pv(cboard : &mut board::chessboard, depth : usize) {
+    print!(" pv ");
+    let mut var_depth = depth;
+
+    for y in 0..depth {
+        if find_transposition(cboard) != 0 {
+            let bestmove = moves::_move{container: find_transposition(cboard), score:0};
+            let move_ = moves::to_AN(&bestmove);
+            for x in 0..5 {
+                print!("{}",move_[x]);
+            }
+            print!(" ");
+            movement::make(&bestmove, cboard);
+        } else {
+            var_depth = y;
+            break
+        }
+    }
+
+    for _ in 0..var_depth {
+        movement::undo(cboard);
+    }
 }

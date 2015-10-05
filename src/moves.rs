@@ -95,6 +95,43 @@ pub fn to_AN(m : &_move) -> [char; 5]{
     result
 }
 
+pub fn from_AN(move_str : &[u8], cboard : &board::chessboard) -> _move{
+    let mut move_list : movelist =  movelist::new();
+    generator(&mut move_list, cboard);
+
+    let from_sq = board::AN_to_board(move_str[0] - 'a' as u8, move_str[1] - '1' as u8);
+    let to_sq   = board::AN_to_board(move_str[2] - 'a' as u8, move_str[3] - '1' as u8);
+    let mut prom : u8 = 0;
+
+    if move_str.len() == 5 {
+        if cboard.side == board::white {
+            match move_str[4] as char{
+                'q' => prom = board::piece::Q as u8,
+                'r' => prom = board::piece::R as u8,
+                'b' => prom = board::piece::B as u8,
+                'n' => prom = board::piece::N as u8,
+                _   => unreachable!()
+            }
+        } else {
+            match move_str[4] as char{
+                'q' => prom = board::piece::q as u8,
+                'r' => prom = board::piece::r as u8,
+                'b' => prom = board::piece::b as u8,
+                'n' => prom = board::piece::n as u8,
+                _   => unreachable!()
+            }
+        }
+    }
+
+    for x in 0..move_list.count as usize {
+        let ref result = move_list.all[x];
+        if to(&result) == to_sq && from(&result) == from_sq && promoted(&result) == prom {
+            return _move{container: result.container, score : 0}
+        }
+    }
+    panic!("Illegal Move");
+}
+
 pub fn generator(list : &mut movelist, cboard : &board::chessboard) {
     let mut baseline : usize = 0;
     if cboard.side == board::black {
