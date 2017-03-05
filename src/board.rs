@@ -136,28 +136,6 @@ pub fn init() -> (chessboard) {
     reset(&mut new_board);
 
     return new_board;
-    /*
-    for x in 0..12 {
-        println!(" {} {} {} {} {} {} {} {} {} {} ", 
-                 new_board.layout[0 + 10 * x],
-                 new_board.layout[1 + 10 * x],
-                 new_board.layout[2 + 10 *x],
-                 new_board.layout[3 + 10 *x],
-                 new_board.layout[4 + 10 *x],
-                 new_board.layout[5 + 10 *x],
-                 new_board.layout[6 + 10 *x],
-                 new_board.layout[7 + 10 *x],
-                 new_board.layout[8 + 10 *x],
-                 new_board.layout[9 + 10 *x]);
-    }
-
-    for x in 0..64 {
-        println!(" {} ", unsafe{chocolate[x]});
-    }
-
-    println!("zobrist hash stored: {}", new_board.zobrist);
-    println!("zobrist hash recalc: {}", zobrist::hash(&new_board));
-    */
 }
 
 pub fn reset (board: &mut chessboard) {
