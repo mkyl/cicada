@@ -1,2 +1,2 @@
 # cicada
-Chess engine compatabile with any interface that uses the universal chess interface (UCI).
+Chess engine compatabile with clients that use the universal chess interface (UCI).
