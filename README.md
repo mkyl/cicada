@@ -7,9 +7,10 @@ Cicada was created as a hobby project. Nonetheless, it implements a substantial 
 - [x] Transposition tables using Zobrist hashing
 - [x] Quiescence Search
 
-[Download](https://github.com/mkyl/cicada/releases)
+### Download
+Download a copy of Cicada from [here](https://github.com/mkyl/cicada/releases). You'll need your own GUI; [Arena](http://www.playwitharena.com/) is a good option.
 
-## Compile
+### Compile
 The program can be built from source by cloning the repository and then running `cargo build --release`.
 
 The sanity of the chess engine can be tested by running `cargo test`. This will run a series of unit and integration tests, including a pretty thorough Perft test.
