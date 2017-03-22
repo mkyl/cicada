@@ -255,17 +255,21 @@ pub fn start(cboard: &mut board::chessboard, depth_target: u8, think_time:i64) {
         target = u8::MAX - 1;
     }
 
-    for depth in 1..target+1 {
-        let mut node : u64 = 0;
-        score = alpha_beta(-inf, inf, depth, cboard, &mut node, end);
-        if node != 0 {
-            print!("info depth {} score cp {} nodes {}", depth, score, node);
-            print_pv(cboard, depth as usize);
-            print!("\n");
+    let mut bestmove = moves::_move{container: 0, score:0};
+
+    unsafe {
+        for depth in 1..target+1 {
+	    let mut node : u64 = 0;
+	    score = alpha_beta(-inf, inf, depth, cboard, &mut node, end);
+	    if node != 0 && time_up == false {
+	        print!("info depth {} score cp {} nodes {}", depth, score, node);
+	        print_pv(cboard, depth as usize);
+	        print!("\n");
+                bestmove = moves::_move{container: find_transposition(cboard), score:0};
+	    }
         }
     }
 
-    let bestmove = moves::_move{container: find_transposition(cboard), score:0};
     print!("bestmove ");
     let move_ = moves::to_AN(&bestmove);
     for x in 0..5 {
@@ -277,7 +281,6 @@ pub fn start(cboard: &mut board::chessboard, depth_target: u8, think_time:i64) {
 
 fn alpha_beta(alpha: i32, beta: i32, depth: u8, cboard: &mut board::chessboard, node : &mut u64, end : time::SteadyTime) -> i32 {
     if depth == 0 {
-       // return evaluate(cboard);
        return quiescence(alpha, beta, cboard);
     }
 
