@@ -44,9 +44,9 @@ fn hashing() {
     let first_hash = main_board.zobrist;
     fen::parse("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 40 32", &mut main_board);
     let second_hash = main_board.zobrist;
-    
+
     assert!(first_hash == second_hash);
-    
+
     fen::parse("8/p7/Pp1p1rk1/1Pp2N2/4P1K1/3P3P/8/8 b - - 0 53", &mut main_board);
     let third_hash = main_board.zobrist;
 
@@ -207,7 +207,7 @@ pub fn perft(depth : i32, cboard : &mut board::chessboard) {
 
     let mut move_list : moves::movelist =  moves::movelist::new();
     moves::generator(&mut move_list, cboard);
-   
+
     for x in 0..move_list.count as usize {
         if !movement::make(&move_list.all[x], cboard) {
             continue
@@ -219,22 +219,22 @@ pub fn perft(depth : i32, cboard : &mut board::chessboard) {
 
 pub fn perft_test(depth: i32, cboard : &mut board::chessboard) -> f64 {
     unsafe {
-    println!("Perft test to depth: {}", depth);
-    leafnodes = 0f64;
+        println!("Perft test to depth: {}", depth);
+        leafnodes = 0f64;
 
-    let mut move_list : moves::movelist =  moves::movelist::new();
-    moves::generator(&mut move_list, cboard);
+        let mut move_list : moves::movelist =  moves::movelist::new();
+        moves::generator(&mut move_list, cboard);
 
-    for x in 0..move_list.count as usize {
-        if !movement::make(&move_list.all[x], cboard) {
-            continue
+        for x in 0..move_list.count as usize {
+            if !movement::make(&move_list.all[x], cboard) {
+                continue
+            }
+            perft(depth - 1, cboard);
+            movement::undo(cboard);
         }
-        perft(depth - 1, cboard);
-        movement::undo(cboard);
-    }
 
-    println!("Test Complete: {} nodes", leafnodes);
-    return leafnodes
+        println!("Test Complete: {} nodes", leafnodes);
+        leafnodes
     }
 }
 

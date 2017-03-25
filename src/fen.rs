@@ -42,7 +42,7 @@ pub fn parse(fen : &str, cboard: &mut board::chessboard) {
 
         if empty != 0 {
             let start = board::AN_to_board(file, rank) as usize;
-            empty = empty - ('0' as u8);
+            empty -= b'0';
 
             for i in 0..empty {
                 cboard.layout[start + i as usize] = piece::Empty as u8;
@@ -51,7 +51,7 @@ pub fn parse(fen : &str, cboard: &mut board::chessboard) {
             file += empty;
         }
 
-        counter += 1; 
+        counter += 1;
     }
     counter += 1;
 
@@ -90,11 +90,11 @@ pub fn parse(fen : &str, cboard: &mut board::chessboard) {
     counter += 1;
 
     // fifty move parsing
-    if fen[counter + 1] as char == ' ' {
-        cboard.fifty = fen[counter] - '0' as u8;
+    if fen[counter + 1] == b' ' {
+        cboard.fifty = fen[counter] - b'0';
         counter +=1;
-    } else if fen[counter + 2] as char == ' ' {
-        cboard.fifty = (fen[counter] - '0' as u8) * 10 + fen[counter + 1] - '0' as u8;
+    } else if fen[counter + 2] == b' ' {
+        cboard.fifty = (fen[counter] - b'0') * 10 + fen[counter + 1] - b'0';
         counter +=2;
     } else {
         panic!("[!] Critical: Invalid FEN fifty move code");
@@ -103,7 +103,7 @@ pub fn parse(fen : &str, cboard: &mut board::chessboard) {
 
     // game depth parsing
     if counter + 3 == fen.len() {
-        cboard.depth = (fen[counter] as u16 - '0' as u16) * 100 + (fen[counter + 1] as u16 - '0' as u16) 
+        cboard.depth = (fen[counter] as u16 - '0' as u16) * 100 + (fen[counter + 1] as u16 - '0' as u16)
             * 10 + fen[counter + 2] as u16 - '0' as u16;
     } else if counter + 2 == fen.len() {
         cboard.depth = (fen[counter] as u16 - '0' as u16) * 10 + fen[counter + 1] as u16 - '0' as u16;
@@ -115,5 +115,5 @@ pub fn parse(fen : &str, cboard: &mut board::chessboard) {
     board::update_pieces(cboard);
 
     // hash update
-    cboard.zobrist = zobrist::hash(cboard); 
+    cboard.zobrist = zobrist::hash(cboard);
 }

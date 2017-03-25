@@ -19,7 +19,7 @@ pub fn make(m : &moves::_move, cboard : &mut board::chessboard) -> bool {
     cboard.past[cboard.depth as usize] = snapshot;
 
     cboard.fifty += 1;
-    
+
     // unhash all the things
     zobrist::castle(cboard);
     zobrist::en_passant(cboard);
@@ -41,7 +41,7 @@ pub fn make(m : &moves::_move, cboard : &mut board::chessboard) -> bool {
             93  => square::plsmove(91, 94, cboard), // black queenside
             _ => {panic!("invalid castling");}
         }
-    } 
+    }
 
     if cboard.layout[origin as usize] == board::piece::P as u8 ||
                     cboard.layout[origin as usize] == board::piece::p as u8{
@@ -102,16 +102,11 @@ pub fn make(m : &moves::_move, cboard : &mut board::chessboard) -> bool {
 
     debug_assert!(sanity::sane(cboard));
 
-    if cboard.side == board::black {
-        if square::attacked(cboard.piece_list[board::piece::K as usize][0], board::black, cboard) {
-            undo(cboard);
-            return false;
-        }
-    } else {
-        if square::attacked(cboard.piece_list[board::piece::k as usize][0], board::white, cboard) {
-            undo(cboard);
-            return false;
-        }
+    if square::attacked(cboard.piece_list[if cboard.side == board::black {
+            board::piece::K } else { board::piece::k } as usize][0],
+            cboard.side, cboard) {
+        undo(cboard);
+        return false;
     }
     true
 }
@@ -151,7 +146,7 @@ pub fn undo(cboard : &mut board::chessboard) {
             93  => square::plsmove(94, 91, cboard), // black queenside
             _ => unreachable!()
         }
-    } 
+    }
 
     square::plsmove(target, origin, cboard);
 
