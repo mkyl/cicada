@@ -3,7 +3,7 @@ use square;
 
 const max_moves : usize = 256;
 const around : [i8; 2] = [1, -1];
-const MVV : [u16; 13] = [0, 0, 5000, 4000, 3000, 2000, 1000, 0, 5000, 4000, 3000, 2000, 1000]; 
+const MVV : [u16; 13] = [0, 0, 5000, 4000, 3000, 2000, 1000, 0, 5000, 4000, 3000, 2000, 1000];
 const AN_pieces: [char; 13] = ['x', 'k', 'q', 'r', 'b', 'n', 'p', 'k', 'q', 'r', 'b', 'n', 'p'];
 
 pub struct _move {
@@ -20,7 +20,7 @@ impl _move {
         combined |= from as u32;
         combined |= (to as u32) << 7;
         combined |= (captured as u32) << 14;
-        combined |= (promoted as u32) << 18; 
+        combined |= (promoted as u32) << 18;
         combined |= (en_passant as u32) << 22;
         combined |= (pawn_double as u32) << 23;
         combined |= (castling as u32) << 24;
@@ -99,8 +99,8 @@ pub fn from_AN(move_str : &[u8], cboard : &board::chessboard) -> _move{
     let mut move_list : movelist =  movelist::new();
     generator(&mut move_list, cboard);
 
-    let from_sq = board::AN_to_board(move_str[0] - 'a' as u8, move_str[1] - '1' as u8);
-    let to_sq   = board::AN_to_board(move_str[2] - 'a' as u8, move_str[3] - '1' as u8);
+    let from_sq = board::AN_to_board(move_str[0] - b'a', move_str[1] - b'1');
+    let to_sq   = board::AN_to_board(move_str[2] - b'a', move_str[3] - b'1');
     let mut prom : u8 = 0;
 
     if move_str.len() == 5 {
@@ -124,8 +124,8 @@ pub fn from_AN(move_str : &[u8], cboard : &board::chessboard) -> _move{
     }
 
     for x in 0..move_list.count as usize {
-        let ref result = move_list.all[x];
-        if to(&result) == to_sq && from(&result) == from_sq && promoted(&result) == prom {
+        let result = &move_list.all[x];
+        if to(result) == to_sq && from(result) == from_sq && promoted(result) == prom {
             return _move{container: result.container, score : 0}
         }
     }
@@ -133,10 +133,7 @@ pub fn from_AN(move_str : &[u8], cboard : &board::chessboard) -> _move{
 }
 
 pub fn generator(list : &mut movelist, cboard : &board::chessboard) {
-    let mut baseline : usize = 0;
-    if cboard.side == board::black {
-        baseline = 6;
-    }
+    let baseline = if cboard.side == board::black { 6 } else { 0 };
 
     for x in (1 + baseline)..(board::piece::k as usize + baseline) {
         for i in 0..cboard.piece_count[x] as usize{
@@ -297,7 +294,7 @@ pub fn generator(list : &mut movelist, cboard : &board::chessboard) {
                 6 => { // pawn
                     let mut dir : i8 = 10;
                     if baseline != 0 { dir = -10 };
-                    
+
                     // quiet moves
                     if cboard.layout[piece.wrapping_add(dir as u8) as usize]
                             == board::piece::Empty as u8 {
@@ -324,7 +321,7 @@ pub fn generator(list : &mut movelist, cboard : &board::chessboard) {
                                     board::piece::q as u8, false, false, false,0), list);
                                 add_move(_move::new(piece, piece.wrapping_add(dir as u8), 0,
                                     board::piece::r as u8, false, false, false,0), list);
-                                add_move(_move::new(piece, piece.wrapping_add(dir as u8), 0, 
+                                add_move(_move::new(piece, piece.wrapping_add(dir as u8), 0,
                                     board::piece::b as u8, false, false, false,0), list);
                                 add_move(_move::new(piece, piece.wrapping_add(dir as u8), 0,
                                     board::piece::n as u8, false, false, false,0), list);
@@ -339,8 +336,8 @@ pub fn generator(list : &mut movelist, cboard : &board::chessboard) {
                     }
 
                     // captures
-                    for y in 0..2 {
-                        let offset = around[y] + dir;
+                    for offs in &around[0..2] {
+                        let offset = offs + dir;
                         let target = cboard.layout[piece.wrapping_add(offset as u8) as usize];
                         // TODO this condition may be too computation-heavy
                         if target != board::void_square &&
@@ -361,7 +358,7 @@ pub fn generator(list : &mut movelist, cboard : &board::chessboard) {
                                     board::piece::q as u8, false, false, false, MVV[target as usize]), list);
                                 add_move(_move::new(piece, piece.wrapping_add(offset as u8), target,
                                     board::piece::r as u8, false, false, false, MVV[target as usize]), list);
-                                add_move(_move::new(piece, piece.wrapping_add(offset as u8), target, 
+                                add_move(_move::new(piece, piece.wrapping_add(offset as u8), target,
                                     board::piece::b as u8, false, false, false, MVV[target as usize]), list);
                                 add_move(_move::new(piece, piece.wrapping_add(offset as u8), target,
                                     board::piece::n as u8, false, false, false, MVV[target as usize]), list);

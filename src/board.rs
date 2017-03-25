@@ -3,7 +3,7 @@ use think;
 pub static mut chocolate : [u8; 64] = [0; 64];
 pub const full_board_size: usize = 120;
 pub const playable_size: usize = 64;
-pub const void_square: u8 = 100; 
+pub const void_square: u8 = 100;
 pub const max_game_length: usize = 1024;
 pub const white: bool = false;
 pub const black: bool = true;
@@ -52,7 +52,7 @@ pub enum castling_bits {
     k_cp = 1 << 2,
     q_cp = 1 << 3
 }
-    
+
 
 pub enum square {
     A1 = 21, B1, C1, D1, E1, F1, G1, H1,
@@ -131,24 +131,24 @@ pub fn init() -> (chessboard) {
         past: unsafe { mem::zeroed() },
         transposition_table: think::transposition_table::new(),
         zobrist: 0
-    }; 
+    };
 
     reset(&mut new_board);
 
-    return new_board;
+    new_board
 }
 
 pub fn reset (board: &mut chessboard) {
     use std::mem;
     use zobrist;
 
-    for i in 0..full_board_size {
-        board.layout[i] = void_square;
+    for mut l in &mut board.layout[0..full_board_size] {
+        *l = void_square;
     }
 
-    for i in 0..playable_size {
-        unsafe {
-            board.layout[chocolate[i] as usize] = piece::Empty as u8;
+    unsafe {
+        for c in &chocolate[..playable_size] {
+            board.layout[*c as usize] = piece::Empty as u8;
         }
     }
 
@@ -162,7 +162,7 @@ pub fn reset (board: &mut chessboard) {
 
     board.score = [0; 2];
 
-    board.castling = castling_bits::K_cp as u8 | castling_bits::Q_cp as u8 
+    board.castling = castling_bits::K_cp as u8 | castling_bits::Q_cp as u8
         | castling_bits::k_cp as u8 | castling_bits::q_cp as u8;
 
     board.en_passant = void_square;
@@ -175,8 +175,8 @@ pub fn reset (board: &mut chessboard) {
 }
 
 pub fn AN_to_chocolate (file : char, rank : u8) -> (u8) {
-    let rank_index = rank - '1' as u8;
-    let file_index = file as u8 - 'a' as u8;
+    let rank_index = rank - b'1';
+    let file_index = file as u8 - b'a';
 
     (rank_index + 2) * 10 + file_index + 1
 }
@@ -187,19 +187,18 @@ pub fn AN_to_board (file : u8, rank : u8) -> (u8) {
 
 pub fn to_AN(square : u8) -> [char; 2] {
     let mut answer : [char; 2] = ['0'; 2];
-    answer[0] = ('a' as u8 + (square % 10 - 1)) as char;
-    answer[1] = ('1' as u8 + (square / 10 - 2)) as char;
+    answer[0] = (b'a' + (square % 10 - 1)) as char;
+    answer[1] = (b'1' + (square / 10 - 2)) as char;
     answer
 }
 
 pub fn update_pieces (cboard: &mut chessboard) {
-    for i in 0..playable_size {
-        unsafe {
-            let index = chocolate[i];
-            let piece = cboard.layout[index as usize];
+    unsafe {
+        for index in &chocolate[..playable_size] {
+            let piece = cboard.layout[*index as usize];
 
             if piece != piece::Empty as u8 {
-                cboard.piece_list[piece as usize][cboard.piece_count[piece as usize] as usize] = index;
+                cboard.piece_list[piece as usize][cboard.piece_count[piece as usize] as usize] = *index;
                 cboard.piece_count[piece as usize] += 1;
                 if piece < 7 {
                     // white
@@ -230,5 +229,5 @@ pub fn print (cboard: &chessboard) {
     println!("white king: {}, black king: {}", cboard.piece_list[piece::K as usize][0], cboard.piece_list[piece::k as usize][0]);
     println!("1 white rook: {}, 2 white rook: {}", cboard.piece_list[piece::R as usize][0], cboard.piece_list[piece::R as usize][1]);
     println!("\nHash: {}", cboard.zobrist);
-    print!("\n");
+    println!();
 }

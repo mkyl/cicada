@@ -10,27 +10,18 @@ pub fn init() {
     use rand::{thread_rng, Rng};
     let mut rng = thread_rng();
 
-    for x in 0..13 {
-        for i in 0..board::full_board_size {
-            unsafe {
-                zobrist[x][i] = rng.gen();
+    unsafe {
+        for mut r in &mut zobrist[..] {
+            for mut b in &mut r[..] {
+                *b = rng.gen();
             }
         }
-    }
-
-    for x in 0..16 {
-        unsafe {
-            castling[x] = rng.gen();
+        for mut c in &mut castling[..] {
+            *c = rng.gen();
         }
-    }
-
-    for x in 0..8 {
-        unsafe {
-            EP[x] = rng.gen();
+        for mut e in &mut EP {
+            *e = rng.gen();
         }
-    }
-
-    unsafe {
         side = rng.gen();
     }
 }
@@ -59,11 +50,11 @@ pub fn hash(sboard: &board::chessboard) -> u64 {
     if sboard.en_passant != board::void_square {
         unsafe {
             // mod 10 to find file
-            hash ^= EP[(sboard.en_passant % 10) as usize - 1]; 
+            hash ^= EP[(sboard.en_passant % 10) as usize - 1];
         }
     }
-    
-    return hash;
+
+    hash
 }
 
 pub fn hash_square(target : u8, cboard: &mut board::chessboard) {
@@ -84,7 +75,7 @@ pub fn en_passant(cboard: &mut board::chessboard) {
     if cboard.en_passant != board::void_square {
         unsafe {
             // mod 10 to find file
-            cboard.zobrist ^= EP[(cboard.en_passant % 10) as usize - 1]; 
+            cboard.zobrist ^= EP[(cboard.en_passant % 10) as usize - 1];
         }
     }
 }

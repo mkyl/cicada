@@ -40,7 +40,7 @@ const white_pawn_piece_square : [i32; 120] =
     0,  0,  0,  0,  0,  0,  0,  0, 0,  0,
     0, 0,  0,  0,  0,  0,  0,  0,  0,  0];
 
-const black_knight_piece_square : [i32; 120] = 
+const black_knight_piece_square : [i32; 120] =
    [0, 0,  0,  0,  0,  0,  0,  0,  0,  0,
     0,  0,  0,  0,  0,  0,  0,  0, 0,  0,
     0, -50,-40,-30,-30,-30,-30,-40,-50, 0,
@@ -54,7 +54,7 @@ const black_knight_piece_square : [i32; 120] =
     0,  0,  0,  0,  0,  0,  0,  0, 0, 0,
     0,  0,  0,  0,  0,  0,  0,  0, 0, 0];
 
-const white_knight_piece_square : [i32; 120] = 
+const white_knight_piece_square : [i32; 120] =
     [0,  0,  0,  0,  0,  0,  0,  0, 0, 0,
     0,  0,  0,  0,  0,  0,  0,  0, 0, 0,
     0, -50,-40,-30,-30,-30,-30,-40,-50, 0,
@@ -139,7 +139,7 @@ impl transposition {
 }
 
 pub struct transposition_table {
-    pub entries: Vec<transposition> 
+    pub entries: Vec<transposition>
 }
 
 impl transposition_table {
@@ -168,9 +168,9 @@ pub fn find_transposition(cboard: &board::chessboard) -> u32 {
     // TODO collisions here should be astronomically rare
     // but is this really the case?
     if cboard.zobrist == cboard.transposition_table.entries[i].hash {
-        return cboard.transposition_table.entries[i].move_
+        cboard.transposition_table.entries[i].move_
     } else {
-        return 0
+        0
     }
 }
 
@@ -192,7 +192,7 @@ fn evaluate (cboard: &board::chessboard) -> i32 {
         let loc = cboard.piece_list[board::piece::P as usize][x];
         score += white_pawn_piece_square[loc as usize];
     }
-   
+
     for x in 0..cboard.piece_count[board::piece::p as usize] as usize{
         let loc = cboard.piece_list[board::piece::p as usize][x];
         score -= black_pawn_piece_square[loc as usize];
@@ -229,9 +229,9 @@ fn evaluate (cboard: &board::chessboard) -> i32 {
     }
 
     if cboard.side == board::white {
-        return score
+        score
     } else {
-        return -score
+        -score
     }
 }
 
@@ -259,23 +259,23 @@ pub fn start(cboard: &mut board::chessboard, depth_target: u8, think_time:i64) {
 
     unsafe {
         for depth in 1..target+1 {
-	    let mut node : u64 = 0;
-	    score = alpha_beta(-inf, inf, depth, cboard, &mut node, end);
-	    if node != 0 && time_up == false {
-	        print!("info depth {} score cp {} nodes {}", depth, score, node);
-	        print_pv(cboard, depth as usize);
-	        print!("\n");
+            let mut node : u64 = 0;
+            score = alpha_beta(-inf, inf, depth, cboard, &mut node, end);
+            if node != 0 && !time_up {
+                print!("info depth {} score cp {} nodes {}", depth, score, node);
+                print_pv(cboard, depth as usize);
+                println!();
                 bestmove = moves::_move{container: find_transposition(cboard), score:0};
-	    }
+            }
         }
     }
 
     print!("bestmove ");
     let move_ = moves::to_AN(&bestmove);
-    for x in 0..5 {
-        print!("{}",move_[x]);
+    for m in &move_[0..5] {
+        print!("{}", m);
     }
-    print!("\n");
+    println!();
 
 }
 
@@ -332,7 +332,7 @@ fn alpha_beta(alpha: i32, beta: i32, depth: u8, cboard: &mut board::chessboard, 
 
         *node += 1;
 
-        if illegal == true {
+        if illegal {
             illegal = false;
         }
 
@@ -351,27 +351,27 @@ fn alpha_beta(alpha: i32, beta: i32, depth: u8, cboard: &mut board::chessboard, 
     if illegal {
         // checkmate
         if cboard.side == board::white {
-            if square::attacked(cboard.piece_list[board::piece::K as usize][0], board::black, cboard) {
-                return -board::piece_value[1] as i32 + cboard.ply as i32;
+            return if square::attacked(cboard.piece_list[board::piece::K as usize][0], board::black, cboard) {
+                -board::piece_value[1] as i32 + cboard.ply as i32
             } else {
                 // stalemate
-                return 0
-            }
+                0
+            };
         } else {
-            if square::attacked(cboard.piece_list[board::piece::k as usize][0], board::white, cboard) {
-                return -board::piece_value[1] as i32 + cboard.ply as i32;
+            return if square::attacked(cboard.piece_list[board::piece::k as usize][0], board::white, cboard) {
+                -board::piece_value[1] as i32 + cboard.ply as i32
             } else {
                 // stalemate
-                return 0
-            }
+                0
+            };
         }
     }
 
     if stale_alpha != new_alpha {
         store_transposition(move_, cboard);
     }
-    
-    return new_alpha
+
+    new_alpha
 }
 
 fn quiescence(alpha: i32, beta: i32, cboard: &mut board::chessboard) -> i32 {
@@ -388,7 +388,7 @@ fn quiescence(alpha: i32, beta: i32, cboard: &mut board::chessboard) -> i32 {
     let mut new_alpha = alpha;
     let stale_alpha = alpha;
     let mut illegal = true;
-    let mut move_ = 0;
+    let mut _move = 0;
     let mut score = -inf;
 
     if eval >= beta {
@@ -410,7 +410,7 @@ fn quiescence(alpha: i32, beta: i32, cboard: &mut board::chessboard) -> i32 {
                 continue
             }
 
-            if illegal == true {
+            if illegal {
                 illegal = false;
             }
 
@@ -422,12 +422,12 @@ fn quiescence(alpha: i32, beta: i32, cboard: &mut board::chessboard) -> i32 {
                     return beta
                 }
                 new_alpha = score;
-                move_ = move_list.all[index].container;
+                _move = move_list.all[index].container;
             }
         }
     }
 
-    return new_alpha
+    new_alpha
 }
 
 fn optimize_mvv_lva(index : usize, list : &mut moves::movelist) {
@@ -457,8 +457,8 @@ fn print_pv(cboard : &mut board::chessboard, depth : usize) {
         if find_transposition(cboard) != 0 {
             let bestmove = moves::_move{container: find_transposition(cboard), score:0};
             let move_ = moves::to_AN(&bestmove);
-            for x in 0..5 {
-                print!("{}",move_[x]);
+            for m in &move_[0..5] {
+                print!("{}", m);
             }
             print!(" ");
             movement::make(&bestmove, cboard);
