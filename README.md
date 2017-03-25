@@ -1,4 +1,6 @@
 # cicada
+[![Build Status](https://travis-ci.org/mkyl/cicada.svg?branch=master)](https://travis-ci.org/mkyl/cicada)
+
 Chess engine compatible with clients that use the universal chess interface (UCI). Ranks around 1450 - 1650 ELO.
 
 Cicada was created as a hobby project. Nonetheless, it implements a substantial set of features:
