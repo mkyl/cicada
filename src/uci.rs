@@ -44,7 +44,7 @@ fn startup_info() {
 
 fn new_game(cboard : &mut board::chessboard) {
     fen::parse("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", cboard);
-    // TODO clear transposition table!
+    // TODO clear Transposition table!
 }
 
 fn parse_position(input : &str, cboard : &mut board::chessboard) {
@@ -81,7 +81,7 @@ fn parse_search(input : &str, cboard : &mut board::chessboard) {
     let mut time = 0;
     let mut depth = 0;
 
-    let time_mark = if cboard.side == board::white { "wtime" } else { "btime" };
+    let time_mark = if cboard.side == board::WHITE { "wtime" } else { "btime" };
     if let Some(i) = v.iter().position(|s| *s == time_mark) {
         time = v[i + 1].parse::<i64>().unwrap();
     }

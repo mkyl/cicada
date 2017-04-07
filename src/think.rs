@@ -5,14 +5,14 @@ use square;
 
 use time;
 
-const hash_map_size : usize = 0x100000;
-const inf : i32 = 100000;
+const HASH_MAP_SIZE : usize = 0x100000;
+const INF : i32 = 100000;
 
-static mut time_up : bool = false;
+static mut TIME_UP : bool = false;
 
 // TODO src https://chessprogramming.wikispaces.com/Simplified+evaluation+function
 
-const black_pawn_piece_square : [i32; 120] =
+const BLACK_PAWN_PIECE_SQUARE : [i32; 120] =
    [0, 0,  0,  0,  0,  0,  0,  0,  0,  0,
     0,  0,  0,  0,  0,  0,  0,  0, 0,  0,
     0, 0,  0,  0,  0,  0,  0,  0,  0,  0,
@@ -26,7 +26,7 @@ const black_pawn_piece_square : [i32; 120] =
     0,  0,  0,  0,  0,  0,  0,  0, 0, 0,
     0,  0,  0,  0,  0,  0,  0,  0, 0, 0];
 
-const white_pawn_piece_square : [i32; 120] =
+const WHITE_PAWN_PIECE_SQUARE : [i32; 120] =
    [0,  0,  0,  0,  0,  0,  0,  0, 0, 0,
     0,  0,  0,  0,  0,  0,  0,  0, 0, 0,
     0,  0,  0,  0,  0,  0,  0,  0, 0, 0,
@@ -40,7 +40,7 @@ const white_pawn_piece_square : [i32; 120] =
     0,  0,  0,  0,  0,  0,  0,  0, 0,  0,
     0, 0,  0,  0,  0,  0,  0,  0,  0,  0];
 
-const black_knight_piece_square : [i32; 120] =
+const BLACK_KNIGHT_PIECE_SQUARE : [i32; 120] =
    [0, 0,  0,  0,  0,  0,  0,  0,  0,  0,
     0,  0,  0,  0,  0,  0,  0,  0, 0,  0,
     0, -50,-40,-30,-30,-30,-30,-40,-50, 0,
@@ -54,7 +54,7 @@ const black_knight_piece_square : [i32; 120] =
     0,  0,  0,  0,  0,  0,  0,  0, 0, 0,
     0,  0,  0,  0,  0,  0,  0,  0, 0, 0];
 
-const white_knight_piece_square : [i32; 120] =
+const WHITE_KNIGHT_PIECE_SQUARE : [i32; 120] =
     [0,  0,  0,  0,  0,  0,  0,  0, 0, 0,
     0,  0,  0,  0,  0,  0,  0,  0, 0, 0,
     0, -50,-40,-30,-30,-30,-30,-40,-50, 0,
@@ -68,7 +68,7 @@ const white_knight_piece_square : [i32; 120] =
     0,  0,  0,  0,  0,  0,  0,  0, 0,  0,
     0, 0,  0,  0,  0,  0,  0,  0,  0,  0];
 
-const black_bishop_piece_square : [i32; 120] =
+const BLACK_BISHOP_PIECE_SQUARE : [i32; 120] =
    [0, 0,  0,  0,  0,  0,  0,  0,  0,  0,
     0,  0,  0,  0,  0,  0,  0,  0, 0,  0,
    0, -20,-10,-10,-10,-10,-10,-10,-20, 0,
@@ -82,7 +82,7 @@ const black_bishop_piece_square : [i32; 120] =
     0,  0,  0,  0,  0,  0,  0,  0, 0, 0,
     0,  0,  0,  0,  0,  0,  0,  0, 0, 0];
 
-const white_bishop_piece_square : [i32; 120] =
+const WHITE_BISHOP_PIECE_SQUARE : [i32; 120] =
     [0,  0,  0,  0,  0,  0,  0,  0, 0, 0,
     0,  0,  0,  0,  0,  0,  0,  0, 0, 0,
    0, -20,-10,-10,-10,-10,-10,-10,-20, 0,
@@ -96,7 +96,7 @@ const white_bishop_piece_square : [i32; 120] =
     0,  0,  0,  0,  0,  0,  0,  0, 0,  0,
     0, 0,  0,  0,  0,  0,  0,  0,  0,  0];
 
-const black_rook_piece_square : [i32; 120] =
+const BLACK_ROOK_PIECE_SQUARE : [i32; 120] =
    [0, 0,  0,  0,  0,  0,  0,  0,  0,  0,
     0,  0,  0,  0,  0,  0,  0,  0, 0,  0,
     0,  0,  0,  0,  0,  0,  0,  0,  0, 0,
@@ -110,7 +110,7 @@ const black_rook_piece_square : [i32; 120] =
     0,  0,  0,  0,  0,  0,  0,  0, 0, 0,
     0,  0,  0,  0,  0,  0,  0,  0, 0, 0];
 
-const white_rook_piece_square : [i32; 120] =
+const WHITE_ROOK_PIECE_SQUARE : [i32; 120] =
     [0,  0,  0,  0,  0,  0,  0,  0, 0, 0,
     0,  0,  0,  0,  0,  0,  0,  0, 0, 0,
     0,  0,  0,  0,  5,  5,  0,  0,  0, 0,
@@ -124,51 +124,51 @@ const white_rook_piece_square : [i32; 120] =
     0,  0,  0,  0,  0,  0,  0,  0, 0,  0,
     0, 0,  0,  0,  0,  0,  0,  0,  0,  0];
 
-pub struct transposition {
+pub struct Transposition {
     pub hash: u64,
     pub move_: u32
 }
 
-impl transposition {
-    fn empty() -> transposition {
-        transposition {
+impl Transposition {
+    fn empty() -> Transposition {
+        Transposition {
             hash: 0,
             move_: 0
         }
     }
 }
 
-pub struct transposition_table {
-    pub entries: Vec<transposition>
+pub struct TranspositionTable {
+    pub entries: Vec<Transposition>
 }
 
-impl transposition_table {
-    pub fn new() -> transposition_table {
+impl TranspositionTable {
+    pub fn new() -> TranspositionTable {
         let mut vector = Vec::new();
-        for _ in 0..hash_map_size {
-            vector.push(transposition::empty());
+        for _ in 0..HASH_MAP_SIZE {
+            vector.push(Transposition::empty());
         }
-        transposition_table{
+        TranspositionTable{
             entries: vector
         }
     }
 }
 
 pub fn store_transposition(move_ : u32, cboard : &mut board::chessboard) {
-    let x = cboard.zobrist % hash_map_size as u64;
+    let x = cboard.zobrist % HASH_MAP_SIZE as u64;
     let i = x as usize;
-    cboard.transposition_table.entries[i].hash = cboard.zobrist;
-    cboard.transposition_table.entries[i].move_ = move_;
+    cboard.TranspositionTable.entries[i].hash = cboard.zobrist;
+    cboard.TranspositionTable.entries[i].move_ = move_;
 }
 
 pub fn find_transposition(cboard: &board::chessboard) -> u32 {
-    let x = cboard.zobrist % hash_map_size as u64;
+    let x = cboard.zobrist % HASH_MAP_SIZE as u64;
     let i = x as usize;
 
     // TODO collisions here should be astronomically rare
     // but is this really the case?
-    if cboard.zobrist == cboard.transposition_table.entries[i].hash {
-        cboard.transposition_table.entries[i].move_
+    if cboard.zobrist == cboard.TranspositionTable.entries[i].hash {
+        cboard.TranspositionTable.entries[i].move_
     } else {
         0
     }
@@ -184,51 +184,51 @@ pub fn repetition (cboard : &board::chessboard) -> bool{
 }
 
 fn evaluate (cboard: &board::chessboard) -> i32 {
-    //  raw score        = white           - black
+    //  raw score        = WHITE           - BLACK
     let material_balance = cboard.score[0] - cboard.score[1];
     let mut score = material_balance;
 
     for x in 0..cboard.piece_count[board::piece::P as usize] as usize{
         let loc = cboard.piece_list[board::piece::P as usize][x];
-        score += white_pawn_piece_square[loc as usize];
+        score += WHITE_PAWN_PIECE_SQUARE[loc as usize];
     }
 
     for x in 0..cboard.piece_count[board::piece::p as usize] as usize{
         let loc = cboard.piece_list[board::piece::p as usize][x];
-        score -= black_pawn_piece_square[loc as usize];
+        score -= BLACK_PAWN_PIECE_SQUARE[loc as usize];
     }
 
     for x in 0..cboard.piece_count[board::piece::N as usize] as usize {
         let loc = cboard.piece_list[board::piece::N as usize][x];
-        score += white_knight_piece_square[loc as usize];
+        score += WHITE_KNIGHT_PIECE_SQUARE[loc as usize];
     }
 
     for x in 0..cboard.piece_count[board::piece::n as usize] as usize {
         let loc = cboard.piece_list[board::piece::n as usize][x];
-        score -= black_knight_piece_square[loc as usize];
+        score -= BLACK_KNIGHT_PIECE_SQUARE[loc as usize];
     }
 
     for x in 0..cboard.piece_count[board::piece::B as usize] as usize {
         let loc = cboard.piece_list[board::piece::B as usize][x];
-        score += white_bishop_piece_square[loc as usize];
+        score += WHITE_BISHOP_PIECE_SQUARE[loc as usize];
     }
 
     for x in 0..cboard.piece_count[board::piece::b as usize] as usize {
         let loc = cboard.piece_list[board::piece::b as usize][x];
-        score -= black_bishop_piece_square[loc as usize];
+        score -= BLACK_BISHOP_PIECE_SQUARE[loc as usize];
     }
 
     for x in 0..cboard.piece_count[board::piece::R as usize] as usize {
         let loc = cboard.piece_list[board::piece::R as usize][x];
-        score += white_rook_piece_square[loc as usize];
+        score += WHITE_ROOK_PIECE_SQUARE[loc as usize];
     }
 
     for x in 0..cboard.piece_count[board::piece::r as usize] as usize {
         let loc = cboard.piece_list[board::piece::r as usize][x];
-        score -= black_rook_piece_square[loc as usize];
+        score -= BLACK_ROOK_PIECE_SQUARE[loc as usize];
     }
 
-    if cboard.side == board::white {
+    if cboard.side == board::WHITE {
         score
     } else {
         -score
@@ -245,7 +245,7 @@ pub fn start(cboard: &mut board::chessboard, depth_target: u8, think_time:i64) {
     let mut end = time::SteadyTime::now() + time::Duration::milliseconds((think_time/30) - 75);
     let mut target = depth_target;
 
-    unsafe { time_up = false; }
+    unsafe { TIME_UP = false; }
 
     if think_time == 0 {
         end = time::SteadyTime::now() + time::Duration::weeks(1);
@@ -255,17 +255,17 @@ pub fn start(cboard: &mut board::chessboard, depth_target: u8, think_time:i64) {
         target = u8::MAX - 1;
     }
 
-    let mut bestmove = moves::_move{container: 0, score:0};
+    let mut bestmove = moves::Move{container: 0, score:0};
 
     unsafe {
         for depth in 1..target+1 {
             let mut node : u64 = 0;
-            score = alpha_beta(-inf, inf, depth, cboard, &mut node, end);
-            if node != 0 && !time_up {
-                print!("info depth {} score cp {} nodes {}", depth, score, node);
+            score = alpha_beta(-INF, INF, depth, cboard, &mut node, end);
+            if node != 0 && !TIME_UP {
+                print!("INFo depth {} score cp {} nodes {}", depth, score, node);
                 print_pv(cboard, depth as usize);
                 println!();
-                bestmove = moves::_move{container: find_transposition(cboard), score:0};
+                bestmove = moves::Move{container: find_transposition(cboard), score:0};
             }
         }
     }
@@ -285,12 +285,12 @@ fn alpha_beta(alpha: i32, beta: i32, depth: u8, cboard: &mut board::chessboard, 
     }
 
     if *node % 10000 == 0 && time::SteadyTime::now() > end {
-        unsafe { time_up = true; }
+        unsafe { TIME_UP = true; }
         return 0
     }
 
     unsafe {
-        if time_up {
+        if TIME_UP {
             return 0
         }
     }
@@ -299,20 +299,20 @@ fn alpha_beta(alpha: i32, beta: i32, depth: u8, cboard: &mut board::chessboard, 
     let stale_alpha = alpha;
     let mut illegal = true;
     let mut move_ = 0;
-    let mut score = -inf;
+    let mut score = -INF;
 
     if (repetition(cboard) || cboard.fifty > 99) && cboard.ply > 0 {
         return 0
     }
 
-    if cboard.depth == board::max_game_length as u16 - 1 {
+    if cboard.depth == board::MAX_GAME_LENGTH as u16 - 1 {
         return evaluate(cboard)
     }
 
     let mut move_list : moves::movelist =  moves::movelist::new();
     moves::generator(&mut move_list, cboard);
 
-    let pv = moves::_move{container: find_transposition(cboard), score: 0};
+    let pv = moves::Move{container: find_transposition(cboard), score: 0};
 
     if pv.container != 0 {
         for b in 0..move_list.count as usize {
@@ -350,16 +350,16 @@ fn alpha_beta(alpha: i32, beta: i32, depth: u8, cboard: &mut board::chessboard, 
 
     if illegal {
         // checkmate
-        if cboard.side == board::white {
-            return if square::attacked(cboard.piece_list[board::piece::K as usize][0], board::black, cboard) {
-                -board::piece_value[1] as i32 + cboard.ply as i32
+        if cboard.side == board::WHITE {
+            return if square::attacked(cboard.piece_list[board::piece::K as usize][0], board::BLACK, cboard) {
+                -board::PIECE_VALUE[1] as i32 + cboard.ply as i32
             } else {
                 // stalemate
                 0
             };
         } else {
-            return if square::attacked(cboard.piece_list[board::piece::k as usize][0], board::white, cboard) {
-                -board::piece_value[1] as i32 + cboard.ply as i32
+            return if square::attacked(cboard.piece_list[board::piece::k as usize][0], board::WHITE, cboard) {
+                -board::PIECE_VALUE[1] as i32 + cboard.ply as i32
             } else {
                 // stalemate
                 0
@@ -379,7 +379,7 @@ fn quiescence(alpha: i32, beta: i32, cboard: &mut board::chessboard) -> i32 {
         return 0
     }
 
-    if cboard.depth == board::max_game_length as u16 - 1 {
+    if cboard.depth == board::MAX_GAME_LENGTH as u16 - 1 {
         return evaluate(cboard)
     }
 
@@ -388,8 +388,8 @@ fn quiescence(alpha: i32, beta: i32, cboard: &mut board::chessboard) -> i32 {
     let mut new_alpha = alpha;
     let stale_alpha = alpha;
     let mut illegal = true;
-    let mut _move = 0;
-    let mut score = -inf;
+    let mut Move = 0;
+    let mut score = -INF;
 
     if eval >= beta {
         return beta
@@ -422,7 +422,7 @@ fn quiescence(alpha: i32, beta: i32, cboard: &mut board::chessboard) -> i32 {
                     return beta
                 }
                 new_alpha = score;
-                _move = move_list.all[index].container;
+                Move = move_list.all[index].container;
             }
         }
     }
@@ -433,7 +433,7 @@ fn quiescence(alpha: i32, beta: i32, cboard: &mut board::chessboard) -> i32 {
 fn optimize_mvv_lva(index : usize, list : &mut moves::movelist) {
     let mut max_score = list.all[index].score;
     let mut max_index = index;
-    let old_move = moves::_move{
+    let old_move = moves::Move{
         container: list.all[index].container,
         score: list.all[index].score};
 
@@ -455,7 +455,7 @@ fn print_pv(cboard : &mut board::chessboard, depth : usize) {
 
     for y in 0..depth {
         if find_transposition(cboard) != 0 {
-            let bestmove = moves::_move{container: find_transposition(cboard), score:0};
+            let bestmove = moves::Move{container: find_transposition(cboard), score:0};
             let move_ = moves::to_AN(&bestmove);
             for m in &move_[0..5] {
                 print!("{}", m);

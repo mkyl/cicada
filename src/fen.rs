@@ -2,7 +2,7 @@ use board;
 use zobrist;
 
 pub fn parse(fen : &str, cboard: &mut board::chessboard) {
-    use board::castling_bits;
+    use board::CastlingBits;
     use board::piece;
     use board::rank;
     use board::file;
@@ -57,9 +57,9 @@ pub fn parse(fen : &str, cboard: &mut board::chessboard) {
 
     // side parsing
     if fen[counter] as char == 'w' {
-        cboard.side = board::white;
+        cboard.side = board::WHITE;
     } else {
-        cboard.side = board::black;
+        cboard.side = board::BLACK;
     }
     counter += 2;
 
@@ -67,10 +67,10 @@ pub fn parse(fen : &str, cboard: &mut board::chessboard) {
     cboard.castling = 0;
     while fen[counter] as char != ' ' {
         match fen[counter] as char {
-            'K' => cboard.castling |= castling_bits::K_cp as u8,
-            'Q' => cboard.castling |= castling_bits::Q_cp as u8,
-            'k' => cboard.castling |= castling_bits::k_cp as u8,
-            'q' => cboard.castling |= castling_bits::q_cp as u8,
+            'K' => cboard.castling |= CastlingBits::K_cp as u8,
+            'Q' => cboard.castling |= CastlingBits::Q_cp as u8,
+            'k' => cboard.castling |= CastlingBits::k_cp as u8,
+            'q' => cboard.castling |= CastlingBits::q_cp as u8,
             '-' => cboard.castling = 0,
              _ => panic!("[!] Critical: Invalid FEN castling code"),
         }
@@ -80,11 +80,11 @@ pub fn parse(fen : &str, cboard: &mut board::chessboard) {
 
     // en passant parsing
     if fen[counter] as char == '-' {
-        cboard.en_passant = board::void_square;
+        cboard.en_passant = board::VOID_SQUARE;
         counter += 1;
     } else {
         cboard.en_passant =
-            board::AN_to_chocolate(fen[counter] as char, fen[counter + 1]);
+            board::AN_to_CHOCOLATE(fen[counter] as char, fen[counter + 1]);
         counter += 2;
     }
     counter += 1;
