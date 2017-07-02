@@ -52,7 +52,9 @@ fn parse_position(input : &str, cboard : &mut board::chessboard) {
 
     if v[1] == "startpos" {
         fen::parse("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", cboard);
-        parse_moves(&v, 2, cboard);
+        if v.len() > 2 {
+            parse_moves(&v, 2, cboard);
+        }
     } else if v[1] == "fen" {
         let fen_code = v[2..8].join(" ");
         fen::parse(&fen_code, cboard);
